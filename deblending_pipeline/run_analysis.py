@@ -1,0 +1,189 @@
+from astropy.io import fits as pf
+import pandas
+#from pandas import DataFrame
+import numpy as np
+import glob
+import os
+import pylab as plt
+from .run_asterism import   DataSetDetection
+
+
+__author__ = "Andrea Tramacere"
+
+
+class DataSetAnalysis(object):
+    
+    
+    
+    def __init__(self,
+                 root_rel_path,
+                 root_data_paht,
+                 data_flag,
+                 sample_flag,
+                 sample_flag_1,
+                 ast_root_path,
+                 ast_flag,
+                 debl_method,
+                 sex_path_seg,
+                 sex_path_debl,
+                 sex_path_debl_1,
+                 sex_flag=None,
+                 debl_segmethod='',
+                 mag=None):
+
+
+
+        self.data_path = os.path.join(root_rel_path ,root_data_paht,data_flag,'data')
+
+
+        # pandas table
+        _pd=os.path.join('%s'%self.data_path, 'sky_to_CANDELS.pkl')
+        print('pandas file',os.path.exists(_pd),_pd)
+        # filter
+        if os.path.exists(_pd) and mag is not None:
+            
+            pd=pandas.read_pickle(_pd)
+            self.debl_filter=np.logical_and(pd['mag']<mag,pd['nearest_mag']<mag)
+        else:
+            self.debl_filter=None
+       
+        
+        #cube and true map file
+        _path = os.path.join(self.data_path, '*%s*_cube*%s*' % (sample_flag, sample_flag_1))
+        # print(_path)
+        _f = glob.glob(_path)
+        # print(_f)
+        _cube = [n for n in _f if 'true' not in n]
+        _true = [n for n in _f if 'true' in n]
+        
+        print('cube',_cube[0])
+        print('true',_true[0])
+        self.cube=pf.getdata(_cube[0])
+        self.true_map=pf.getdata(_true[0])
+
+        ast_path=os.path.join(ast_root_path,data_flag,debl_method,debl_segmethod)
+
+        print('ast_path', os.path.join(ast_path,ast_flag))
+
+        _debl_map_ast = glob.glob('%s/%s*segmentation_map_debl_overlap.fits*'%(ast_path,ast_flag))[0]
+        _seg_map_ast = glob.glob('%s/%s*segmentation_map.fits*'%(ast_path,ast_flag))[0]
+        _deblended_catalog = glob.glob('%s/%s*_deblended_catalog.fits*'%(ast_path,ast_flag))[0]
+        _segment_catalog = glob.glob('%s/%s*_segmentation_catalog.fits*'%(ast_path,ast_flag))[0]
+        print('ast debl_map',_debl_map_ast)
+        print('ast seg_map',_seg_map_ast)
+        print('ast deblended_catalog',_deblended_catalog)
+        print('ast segment_catalog',_segment_catalog)
+        self.debl_map_ast=pf.getdata(_debl_map_ast)
+        self.seg_map_ast= pf.getdata(_seg_map_ast)
+        self.deblended_catalog=pf.getdata(_deblended_catalog)
+        self.segment_catalog=pf.getdata(_segment_catalog)
+
+        # print('%s/segmap_debl_detthr_1.2_minarea_10/%s_%s*DebNthr_64_DebMin_0.002_segmentation_map_debl.fits.gz'%(sex_path,data_flag,sex_flag))
+
+        _path = os.path.join(root_rel_path, sex_path_seg, '%s*%s*_segmap*' % (data_flag, sample_flag))
+        # print('path segmap', _path)
+
+        segmap_file = glob.glob(_path)[0]
+        print('sex segmap',segmap_file)
+        self.seg_map_sex = pf.getdata(segmap_file)
+
+        if sex_flag is not None:
+            _path = os.path.join(root_rel_path, sex_path_debl,data_flag,sex_path_debl_1,'*%s*segmentation_map_debl*'%sex_flag)
+
+            segmap_debl_file = glob.glob(_path)[0]
+            print('sex debl_map', segmap_debl_file)
+            self.debl_map_sex = pf.getdata(segmap_debl_file)
+
+
+
+
+
+
+    @classmethod
+    def build_couple_skymaker_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag,mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='couples_19_26_24.5_d10_r1',
+                sample_flag='cat_tot_vis',
+                sample_flag_1='CANDELS',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='r1_skymaker',
+                sex_flag=sex_flag,
+                mag=mag)
+
+        return d
+
+def select_catalog_par(debl_rep,catalog,p,msk_sel,true_map,seg_map):
+    x=[]
+    p_sel=[]
+    
+    for ID,img_ID in enumerate(debl_rep['image_ID'][msk_sel]-1):
+        id_parent=np.unique(seg_map[img_ID][np.logical_and(true_map[img_ID],seg_map[img_ID])])
+        id_parent=id_parent[id_parent>0]
+        msk=np.logical_and(np.isin(catalog['src_ID'],id_parent),catalog['image_ID']==img_ID)
+        #print(id_parent)
+        if msk.sum()<1:
+            pass
+        else:
+            #print (catalog['image_ID'][msk])
+            x.extend(p[msk])
+           
+            
+    for ID,img_ID in enumerate(debl_rep['image_ID']-1):
+        id_parent=np.unique(seg_map[img_ID][np.logical_and(true_map[img_ID],seg_map[img_ID])])
+        id_parent=id_parent[id_parent>0]
+        msk=np.logical_and(np.isin(catalog['src_ID'],id_parent),catalog['image_ID']==img_ID)
+        #print(id_parent)
+       
+       
+        if msk.sum()<1:
+            pass
+        else:
+            #print (catalog['image_ID'][msk])
+            
+            p_sel.extend(p[msk])
+     
+    return np.array(x),np.array(p_sel)
+
+
+def anlysis(debl_rep,segment_catalog,deblended_catalog,n_sim,true_map,seg_map):
+    
+    fig,(ax1,ax2,ax3)=plt.subplots(1,3,figsize=(12,4))
+    p=segment_catalog['r_max']/segment_catalog['r_cluster']
+    
+    h=np.zeros(p.size)
+    for ID,im_id in enumerate(segment_catalog['image_ID']):
+        _h=deblended_catalog['h'][deblended_catalog['image_ID']==im_id-1]
+        if len(_h)==0:
+            h[ID]=None
+        else:
+            h[ID]=_h[0]
+
+    print(h[~np.isnan(h)].min(),h[~np.isnan(h)].max())
+    p=h/segment_catalog['r_max']
+
+    msk_sel=debl_rep['overlap']>n_sim
+    x,p_sel=select_catalog_par(debl_rep,segment_catalog,p,msk_sel,true_map,seg_map)
+    ax1.hist(p_sel,density=True)
+    ax1.hist(x,fill=False,density=True,edgecolor='red',alpha=0.5)
+
+    msk_sel=debl_rep['overlap']<n_sim
+    x,p_sel=select_catalog_par(debl_rep,segment_catalog,p,msk_sel,true_map,seg_map)
+    ax2.hist(p_sel,density=True)
+    ax2.hist(x,fill=False,density=True,edgecolor='blue',alpha=0.5)
+
+    msk_sel=debl_rep['overlap']==n_sim
+    x,p_sel=select_catalog_par(debl_rep,segment_catalog,p,msk_sel,true_map,seg_map)
+    ax3.hist(p_sel,density=True)
+    ax3.hist(x,fill=False,density=True,edgecolor='black',alpha=0.5)
+
+        
+        
+
+
+
