@@ -7,7 +7,7 @@ import os
 from asterism.analysis_pipelines.source_detection import SrcDetectionPipeline
 import sys
 import warnings
-
+import json
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
@@ -15,8 +15,8 @@ if not sys.warnoptions:
 
 class DataSetDetection(object):
 
-    def __init__(self,root_rel_path,data_root_path,data_flag,sample_flag,sample_flag_1,segmap_root_path):
-
+    def __init__(self,root_rel_path,data_root_path,data_flag,sample_flag,sample_flag_1,segmap_root_path,name=None):
+        print("Run asterism conf:",name)
         self.data_flag = data_flag
         self.sample_flag = sample_flag
         self.sample_flag_1 = sample_flag_1
@@ -27,7 +27,7 @@ class DataSetDetection(object):
 
 
         _path = os.path.join(self.data_path, '*%s*_cube*%s*' % (self.sample_flag, sample_flag_1))
-        print('path cube', _path)
+
         _f = glob.glob(_path)
         
         _cube = [n for n in _f if 'true' not in n]
@@ -35,44 +35,107 @@ class DataSetDetection(object):
         
         self.cube_file = _cube[0]
         self.rms_file = os.path.join(self.data_path,'rms_map_0.00289.fits')
-
+        print('-> cube file', self.cube_file)
+        print('-> rms file', self.rms_file)
         _path = os.path.join(root_rel_path,segmap_root_path,'%s*%s*_segmap*' % (self.data_flag,self.sample_flag))
-        print('path segmap', _path)
 
-        self.segmap_file = glob.glob(_path)[0]
+        try:
+            self.segmap_file = glob.glob(_path)[0]
+        except:
+            raise  RuntimeError('segmap path problem', _path)
 
-        print(os.path.exists(self.cube_file), self.cube_file)
-        print(os.path.exists(self.rms_file), self.rms_file)
-        print(os.path.exists(self.segmap_file), self.segmap_file)
+        print('-> segmap file',  self.segmap_file)
+        #print(os.path.exists(self.cube_file), self.cube_file)
+        #print(os.path.exists(self.rms_file), self.rms_file)
+        #print(os.path.exists(self.segmap_file), self.segmap_file)
 
     @classmethod
-    def build_couple_skymaker_r1(cls, root_rel_path):
-        return cls(root_rel_path,'datasets', 'couples_19_26_24.5_d10_r1', 'cat_tot_vis', 'CANDELS', 'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10')
+    def from_name_factory(cls, name, root_rel_path,):
+        _dict = {}
+        _dict['couple_skymaker_r1'] = cls.build_couple_skymaker_r1
+        _dict['couple_skymaker_r5'] = cls.build_couple_skymaker_r5
+        _dict['couple_CANDELS_r1'] = cls.build_couple_CANDELS_r1
+        _dict['couple_CANDELS_r5'] = cls.build_couple_CANDELS_r5
+        _dict['single_skymaker_r1'] = cls.build_single_skymaker_r1
+        _dict['single_CANDELS_r1'] = cls.build_single_skymaker_r1
+        _dict['couple_big_skymaker_r10'] = cls.build_couple_big_skymaker_r10
+        _dict['couple_big_CANDELS_r10'] = cls.build_couple_big_CANDELS_r10
+
+        return _dict[name](root_rel_path,)
+
 
     @classmethod
-    def build_couple_CANDELS_r1(cls, root_rel_path):
-        return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r1', 'real', 'n_obj_2', 'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10')
+    def build_couple_skymaker_r1(cls, root_rel_path,name='couple_skymaker_r1'):
+        return cls(root_rel_path,'datasets', 'couples_19_26_24.5_d10_r1', 'cat_tot_vis', 'CANDELS',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
+    @classmethod
+    def build_couple_CANDELS_r1(cls, root_rel_path,name='couple_CANDELS_r1'):
+        return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r1', 'real', 'n_obj_2',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
+    @classmethod
+    def build_single_skymaker_r1(cls, root_rel_path,name='single_skymaker_r1'):
+        return cls(root_rel_path, 'datasets', 'single_19_26_24.5_d10_r1', 'cat_tot_vis', 'CANDELS',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
+    @classmethod
+    def build_single_CANDELS_r1(cls, root_rel_path, name='single_CANDELS_r1'):
+        return cls(root_rel_path, 'datasets', 'single_19_26_24.5_d10_r1', 'real', 'n_obj_1',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10', name=name)
+
+
+    @classmethod
+    def build_couple_skymaker_r5(cls, root_rel_path,name='couple_skymaker_r5'):
+        return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r5', 'cat_tot_vis', 'CANDELS',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
+    @classmethod
+    def build_couple_CANDELS_r5(cls, root_rel_path,name='couple_CANDELS_r5'):
+        return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r5', 'real', 'n_obj_2',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
+    @classmethod
+    def build_couple_big_skymaker_r10(cls, root_rel_path,name='couple_big_skymaker_r10'):
+        return cls(root_rel_path, 'datasets', 'big_19_23_24.5_d50_r10', 'cat_tot_vis', 'CANDELS',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
+    @classmethod
+    def build_couple_big_CANDELS_r10(cls, root_rel_path,name='couple_big_CANDELS_r10'):
+        return cls(root_rel_path, 'datasets', 'big_19_23_24.5_d50_r10', 'real', 'n_obj_2',
+                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+
 
     @staticmethod
     def get_run_flag(h_frac_min,
                      h_frac_max,
+                     K_denclue,
                      validate_children,
                      valid_abs_size_th,
                      valid_sig_th,
                      valid_overlap_max,
                      downsampling):
 
-        flag = 'h_min_%2.2f_h_max_%2.2f_donws_%d_valid_%d_' % (h_frac_min, h_frac_max,downsampling,validate_children)
+        flag = 'h_min_%2.2f_h_max_%2.2f_K_denc_%2.2d_donws_%d_valid_%d' % (h_frac_min, h_frac_max,K_denclue,downsampling,validate_children)
         if validate_children is True:
-            flag = flag+'size_th_%3.3d_sig_th_%2.2f_overlap_th_%2.2f'%(valid_abs_size_th, valid_sig_th,
+            flag = flag+'_size_th_%3.3d_sig_th_%2.2f_overlap_th_%2.2f'%(valid_abs_size_th, valid_sig_th,
                                                                         valid_overlap_max)
         return flag
+
+    @staticmethod
+    def get_wd(wd,
+               data_flag,
+               method,
+               denclue_segm_method):
+
+        return os.path.join(wd,data_flag,method, 'seg_%s' % denclue_segm_method)
 
     def run_detection(self,
                       conf_file,
                       wd,
                       h_frac_min,
                       h_frac_max,
+                      K_denclue,
                       method,
                       validate_children,
                       denclue_segm_method='',
@@ -81,25 +144,29 @@ class DataSetDetection(object):
                       save_products=True,
                       valid_abs_size_th=8,
                       valid_sig_th=1.5,
-                      overlap_max=0.85):
+                      overlap_max=0.85,
+                      log_file=None):
 
         _run_detection(cube=self.cube_file,
-                      conf_file=conf_file,
-                      rms_file=self.rms_file,
-                      segm_file=self.segmap_file,
-                      wd=wd,
-                      save_products=save_products,
-                      method=method,
-                      denclue_segm_method=denclue_segm_method,
-                      h_frac_max=h_frac_max,
-                      h_frac_min=h_frac_min,
-                      morph_corr=False,
-                      downsampling=downsampling,
-                      validate_children=validate_children,
-                      max_image_id=max_image_id,
-                      valid_abs_size_th=valid_abs_size_th,
-                      valid_sig_th=valid_sig_th,
-                      overlap_max=overlap_max)
+                       K_denclue=K_denclue,
+                       conf_file=conf_file,
+                       rms_file=self.rms_file,
+                       segm_file=self.segmap_file,
+                       data_flag=self.data_flag,
+                       wd=wd,
+                       save_products=save_products,
+                       method=method,
+                       denclue_segm_method=denclue_segm_method,
+                       h_frac_max=h_frac_max,
+                       h_frac_min=h_frac_min,
+                       morph_corr=False,
+                       downsampling=downsampling,
+                       validate_children=validate_children,
+                       max_image_id=max_image_id,
+                       valid_abs_size_th=valid_abs_size_th,
+                       valid_sig_th=valid_sig_th,
+                       overlap_max=overlap_max,
+                       log_file=log_file)
 
 
 
@@ -112,6 +179,7 @@ def _run_detection(cube,
                    conf_file,
                    rms_file=None,
                    segm_file=None,
+                   data_flag=None,
                    image_id=None,
                    wd=None,
                    max_image_id=None,
@@ -124,11 +192,17 @@ def _run_detection(cube,
                    valid_abs_size_th=8,
                    valid_sig_th=1.5,
                    overlap_max=0.85,
+                   K_denclue=4,
                    downsampling=True,
                    validate_children=True,
-                   morph_corr=False):
+                   morph_corr=False,
+                   log_file=None):
+
+    pars_dict=locals()
+
 
     pipeline = SrcDetectionPipeline(parser=None, argv=None, conf_file=conf_file)
+
     # pipeline.dump_configuration_file('pipeline.conf')
     # source the configuration from the conf file
     # all the parameters are set from conf file
@@ -147,6 +221,7 @@ def _run_detection(cube,
     pipeline.IO_conf_task.set_par('input_seg_map_file', value=segm_file)
     pipeline.IO_conf_task.set_par('save_products', value=save_products)
     pipeline.IO_conf_task.set_par('out_name', value='')
+    pipeline.IO_conf_task.set_par('log_file', value=log_file)
 
     # To display segmentation
     pipeline.do_src_detection.image_segmentation.set_par('plot',value=plot)
@@ -168,11 +243,11 @@ def _run_detection(cube,
     else:
         im_seg_method = 'connected'
 
-    wd_flag = os.path.join(method, 'seg_%s' % denclue_segm_method)
+    #wd_flag = os.path.join(method, 'seg_%s' % denclue_segm_method)
     if wd is not None:
-        wd_flag = os.path.join(wd,wd_flag)
+        wd = DataSetDetection.get_wd(wd,data_flag,method,denclue_segm_method)
 
-    pipeline.IO_conf_task.set_par('working_dir',value=wd_flag)
+    pipeline.IO_conf_task.set_par('working_dir',value=wd)
 
     pipeline.do_src_detection.deblending_validation.set_par('validate_children', value=validate_children)
     pipeline.do_src_detection.deblending_validation.set_par('abs_size_th', value=valid_abs_size_th)
@@ -185,6 +260,7 @@ def _run_detection(cube,
         pipeline.do_src_detection.denclue_deblending.set_par('segmentation_method', value=denclue_segm_method)
 
     pipeline.do_src_detection.denclue_deblending.set_par('morphological_correction', value=morph_corr)
+    pipeline.do_src_detection.denclue_deblending.set_par('attr_dbs_K',value=K_denclue)
     pipeline.do_src_detection.denclue_deblending.set_par('do_downsampling', value=downsampling)
     pipeline.do_src_detection.image_segmentation.set_par('method', value=im_seg_method)
 
@@ -195,17 +271,27 @@ def _run_detection(cube,
     
     flag = DataSetDetection.get_run_flag(h_frac_min,
                                          h_frac_max,
+                                         K_denclue,
                                          validate_children,
                                          valid_abs_size_th,
                                          valid_sig_th,
                                          overlap_max,
                                          downsampling)
-    print("flag", flag)
+    #print("flag", flag)
     pipeline.IO_conf_task.set_par('flag', value=flag)
 
     pipeline.do_src_detection.cluster_scale_finder.set_par('h_min_frac', value=np.float(h_frac_min))
     pipeline.do_src_detection.cluster_scale_finder.set_par('h_max_frac', value=np.float(h_frac_max))
+    par_file = os.path.join(wd, '%s_par.json' % flag)
+    # print('par_file', par_file)
     products_collection = pipeline.run()
+    with open(par_file, 'w') as fp:
+        json.dump(pars_dict, fp)
+    products_collection = pipeline.run()
+
+
+
+
     pipeline.dump_configuration_file(flag+'.conf')
 
 

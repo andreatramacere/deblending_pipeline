@@ -1,6 +1,6 @@
 from astropy.io import fits as pf
 import pandas
-#from pandas import DataFrame
+from pandas import DataFrame
 import numpy as np
 import glob
 import os
@@ -27,11 +27,13 @@ class DataSetAnalysis(object):
                  sex_path_seg,
                  sex_path_debl,
                  sex_path_debl_1,
+                 n_sim=2,
                  sex_flag=None,
                  debl_segmethod='',
                  mag=None):
 
 
+        self.n_sim = n_sim
 
         self.data_path = os.path.join(root_rel_path ,root_data_paht,data_flag,'data')
 
@@ -55,47 +57,67 @@ class DataSetAnalysis(object):
         # print(_f)
         _cube = [n for n in _f if 'true' not in n]
         _true = [n for n in _f if 'true' in n]
-        
-        print('cube',_cube[0])
-        print('true',_true[0])
+
         self.cube=pf.getdata(_cube[0])
         self.true_map=pf.getdata(_true[0])
+        print('-> cube file', _cube[0])
+        print('-> true map file', _true[0])
 
-        ast_path=os.path.join(ast_root_path,data_flag,debl_method,debl_segmethod)
+        if ast_flag is not None:
+            ast_path=os.path.join(ast_root_path,data_flag,debl_method,debl_segmethod)
 
-        print('ast_path', os.path.join(ast_path,ast_flag))
-
-        _debl_map_ast = glob.glob('%s/%s*segmentation_map_debl_overlap.fits*'%(ast_path,ast_flag))[0]
-        _seg_map_ast = glob.glob('%s/%s*segmentation_map.fits*'%(ast_path,ast_flag))[0]
-        _deblended_catalog = glob.glob('%s/%s*_deblended_catalog.fits*'%(ast_path,ast_flag))[0]
-        _segment_catalog = glob.glob('%s/%s*_segmentation_catalog.fits*'%(ast_path,ast_flag))[0]
-        print('ast debl_map',_debl_map_ast)
-        print('ast seg_map',_seg_map_ast)
-        print('ast deblended_catalog',_deblended_catalog)
-        print('ast segment_catalog',_segment_catalog)
-        self.debl_map_ast=pf.getdata(_debl_map_ast)
-        self.seg_map_ast= pf.getdata(_seg_map_ast)
-        self.deblended_catalog=pf.getdata(_deblended_catalog)
-        self.segment_catalog=pf.getdata(_segment_catalog)
+            print('ast_path', os.path.join(ast_path,ast_flag))
+            self.ast_path=ast_path
+            try:
+                _debl_map_ast = glob.glob('%s/%s*segmentation_map_debl_overlap.fits*'%(ast_path,ast_flag))[0]
+                _seg_map_ast = glob.glob('%s/%s*segmentation_map.fits*'%(ast_path,ast_flag))[0]
+                _deblended_catalog = glob.glob('%s/%s*_deblended_catalog.fits*'%(ast_path,ast_flag))[0]
+                _segment_catalog = glob.glob('%s/%s*_segmentation_catalog.fits*'%(ast_path,ast_flag))[0]
+            except:
+                raise RuntimeError('ast path problem', os.path.join(ast_path,ast_flag))
+            print('ast debl_map',_debl_map_ast)
+            print('ast seg_map',_seg_map_ast)
+            print('ast deblended_catalog',_deblended_catalog)
+            print('ast segment_catalog',_segment_catalog)
+            self.debl_map_ast=pf.getdata(_debl_map_ast)
+            self.seg_map_ast= pf.getdata(_seg_map_ast)
+            self.deblended_catalog=pf.getdata(_deblended_catalog)
+            self.segment_catalog=pf.getdata(_segment_catalog)
 
         # print('%s/segmap_debl_detthr_1.2_minarea_10/%s_%s*DebNthr_64_DebMin_0.002_segmentation_map_debl.fits.gz'%(sex_path,data_flag,sex_flag))
 
-        _path = os.path.join(root_rel_path, sex_path_seg, '%s*%s*_segmap*' % (data_flag, sample_flag))
-        # print('path segmap', _path)
 
-        segmap_file = glob.glob(_path)[0]
-        print('sex segmap',segmap_file)
-        self.seg_map_sex = pf.getdata(segmap_file)
-
+        self.sex_deblm_map_path=os.path.join(root_rel_path, sex_path_debl,data_flag,sex_path_debl_1)
         if sex_flag is not None:
-            _path = os.path.join(root_rel_path, sex_path_debl,data_flag,sex_path_debl_1,'*%s*segmentation_map_debl*'%sex_flag)
+            #_path_sex_segmap = os.path.join(root_rel_path, sex_path_seg, '%s*%s*_segmap*' % (data_flag, sample_flag))
+            # print('path segmap', _path)
 
-            segmap_debl_file = glob.glob(_path)[0]
-            print('sex debl_map', segmap_debl_file)
+            #segmap_file = glob.glob(_path)[0]
+            #print('-> sex segmap', segmap_file)
+            #self.seg_map_sex = pf.getdata(segmap_file)
+
+            _path = os.path.join( self.sex_deblm_map_path,'*%s*segmentation_map_debl*'%sex_flag)
+            #print('_path',_path)
+            try:
+                segmap_debl_file = glob.glob(_path)[0]
+            except:
+                raise RuntimeError('sex path problem', _path)
+            print('-> sex debl_map', segmap_debl_file)
             self.debl_map_sex = pf.getdata(segmap_debl_file)
 
+    @classmethod
+    def from_name_factory(cls,name,root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag,mag=None):
+        _dict={}
+        _dict['couple_skymaker_r1'] = cls.build_couple_skymaker_r1
+        _dict['couple_skymaker_r5'] = cls.build_couple_skymaker_r5
+        _dict['single_skymaker_r1'] = cls.build_single_skymaker_r1
+        _dict['single_CANDELS_r1'] = cls.build_single_CANDELS_r1
+        _dict['couple_CANDELS_r1'] = cls.build_couple_CANDELS_r1
+        _dict['couple_CANDELS_r5'] = cls.build_couple_CANDELS_r5
+        _dict['couple_big_skymaker_r10'] = cls.build_couple_big_skymaker_r10
+        _dict['couple_big_CANDELS_r10'] = cls.build_couple_big_CANDELS_r10
 
-
+        return _dict[name](root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag,mag=mag)
 
 
 
@@ -113,6 +135,141 @@ class DataSetAnalysis(object):
                 sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
                 sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
                 sex_path_debl_1='r1_skymaker',
+                sex_flag=sex_flag,
+                mag=mag)
+
+        return d
+
+    @classmethod
+    def build_couple_skymaker_r5(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='couples_19_26_24.5_d10_r5',
+                sample_flag='cat_tot_vis',
+                sample_flag_1='CANDELS',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='r5_skymaker',
+                sex_flag=sex_flag,
+                mag=mag)
+
+        return d
+
+    @classmethod
+    def build_couple_CANDELS_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='couples_19_26_24.5_d10_r1',
+                sample_flag='real',
+                sample_flag_1='n_obj_2',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='r1_CANDELS',
+                sex_flag=sex_flag,
+                mag=mag)
+
+        return d
+
+    @classmethod
+    def build_couple_CANDELS_r5(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='couples_19_26_24.5_d10_r5',
+                sample_flag='real',
+                sample_flag_1='n_obj_2',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='r5_skymaker',
+                sex_flag=sex_flag,
+                mag=mag)
+
+        return d
+
+    @classmethod
+    def build_single_skymaker_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='single_19_26_24.5_d10_r1',
+                sample_flag='cat_tot_vis',
+                sample_flag_1='CANDELS',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='r1_skymaker',
+                sex_flag=sex_flag,
+                mag=mag,
+                n_sim=1)
+        return d
+
+    @classmethod
+    def build_single_CANDELS_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='single_19_26_24.5_d10_r1',
+                sample_flag='real',
+                sample_flag_1='n_obj_1',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='r1_skymaker',
+                sex_flag=sex_flag,
+                mag=mag,
+                n_sim=1)
+
+        return d
+
+
+    @classmethod
+    def build_couple_big_skymaker_r10(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='big_19_23_24.5_d50_r10',
+                sample_flag='cat_tot_vis',
+                sample_flag_1='CANDELS',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='big_r10_skymaker',
+                sex_flag=sex_flag,
+                mag=mag)
+
+        return d
+
+    @classmethod
+    def build_couple_big_CANDELS_r10(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag, mag=None):
+        d = cls(root_rel_path,
+                'datasets',
+                data_flag='big_19_23_24.5_d50_r10',
+                sample_flag='real',
+                sample_flag_1='n_obj_2',
+                ast_root_path='deblending_detection/asterism',
+                ast_flag=ast_flag,
+                debl_method=debl_method,
+                debl_segmethod=debl_segmethod,
+                sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
+                sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl_1='big_r10_candels',
                 sex_flag=sex_flag,
                 mag=mag)
 
@@ -182,8 +339,8 @@ def anlysis(debl_rep,segment_catalog,deblended_catalog,n_sim,true_map,seg_map):
     ax3.hist(p_sel,density=True)
     ax3.hist(x,fill=False,density=True,edgecolor='black',alpha=0.5)
 
-        
-        
+
+
 
 
 

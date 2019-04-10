@@ -5,6 +5,8 @@ __author__ = "Andrea Tramacere"
 
 
 def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=False):
+    #print('---> image_ID',image_ID)
+    #print(ID_sim_list,candidate_df['sim_ID']==ID_sim_list[0],candidate_df['image_ID']==image_ID)
     assoc_dict = {}
     assoc_list = []
     sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
@@ -57,7 +59,12 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
 
 def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, contam_th=-1, verbose=False):
     print('debl_quality_analysis', 'true map shape', true_map.shape)
-    out=np.zeros(true_map.shape[0],dtype=[('image_ID', '>i4'), ('success_n', 'bool'), ('success_qual', 'bool'), ('overlap', '>i4'), ('assoc', '>i4'), ('contaminant', '>i4')])
+    out=np.zeros(true_map.shape[0],dtype=[('image_ID', '>i4'),
+                                          ('success_n', 'bool'),
+                                          ('success_qual', 'bool'),
+                                          ('overlap', 'i4'),
+                                          ('assoc', 'i4'),
+                                          ('contaminant', 'i4')])
     for ID_img,tm in enumerate(true_map):
         
         ID_sim_list = np.unique(true_map[ID_img][true_map[ID_img] > 0]).astype(np.int)
@@ -120,26 +127,26 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
         candidate_df=build_candidate_df(cube,true_map,debl_map,overlap_th=-1,verbose=verbose)
 
     # df=pandas.read_pickle('df.pd')
-    debl_rep = debl_quality_analysis(true_map,candidate_df,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,contam_th=contam_th,verbose=verbose)
+    debl_analysis_table= debl_quality_analysis(true_map,candidate_df,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,contam_th=contam_th,verbose=verbose)
     
     if debl_filter is not None:
-            debl_rep=debl_rep[debl_filter]
+        debl_analysis_table=debl_analysis_table[debl_filter]
     
-    print('filtered size',debl_rep.size)
-    over=debl_rep['contaminant']>0
-    under=debl_rep['assoc']<n_sim
-    non_det=debl_rep['overlap']<1
+    print('filtered size',debl_analysis_table.size)
+    over=debl_analysis_table['contaminant']>0
+    under=debl_analysis_table['assoc']<n_sim
+    non_det=debl_analysis_table['overlap']<1
     
-    det_ok_frac=debl_rep['success_n'].sum()/debl_rep['image_ID'].size
+    det_ok_frac=debl_analysis_table['success_n'].sum()/debl_analysis_table['image_ID'].size
 
-    frac_ok_th=debl_rep['success_qual'].sum()/debl_rep['image_ID'].size  
-    frac_ok_th_real=debl_rep['success_qual'].sum()/(debl_rep['image_ID'].size-non_det.sum())
+    frac_ok_th=debl_analysis_table['success_qual'].sum()/debl_analysis_table['image_ID'].size
+    frac_ok_th_real=debl_analysis_table['success_qual'].sum()/(debl_analysis_table['image_ID'].size-non_det.sum())
     
-    over_frac=over.sum()/debl_rep['image_ID'].size
-    under_frac=under.sum()/debl_rep['image_ID'].size
+    over_frac=over.sum()/debl_analysis_table['image_ID'].size
+    under_frac=under.sum()/debl_analysis_table['image_ID'].size
     
-    over_frac_real=over.sum()/(debl_rep['image_ID'].size-non_det.sum())
-    under_frac_real=under.sum()/(debl_rep['image_ID'].size-non_det.sum())
+    over_frac_real=over.sum()/(debl_analysis_table['image_ID'].size-non_det.sum())
+    under_frac_real=under.sum()/(debl_analysis_table['image_ID'].size-non_det.sum())
     if n_sim==1:
         under_frac=None
         under_frac_real=None
@@ -148,18 +155,18 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
            '\nfraction of debl OK>th     ',frac_ok_th,
            '\nfraction of underdebl      ',under_frac,
            '\nfraction of overdebl       ',over_frac,
-           '\nfraction of non-detected   ',non_det.sum()/debl_rep['image_ID'].size,
-           # '\nspurious (not in true map) ',debl_rep['found'].sum()-debl_rep['overlap'].sum(),
+           '\nfraction of non-detected   ',non_det.sum()/debl_analysis_table['image_ID'].size,
+           # '\nspurious (not in true map) ',debl_analysis_table['found'].sum()-debl_analysis_table['overlap'].sum(),
            '\nfraction of debl OK>th     (excluding non-detected)',frac_ok_th_real,
            '\nfraction of underdebl      (excluding non-detected)',under_frac_real,
            '\nfraction of overdebl       (excluding non-detected)',over_frac_real)
            
     print()
-    ID_list_KO_over_ast = debl_rep['image_ID'][over]-1
+    ID_list_KO_over_ast = debl_analysis_table['image_ID'][over]-1
     print('len over list',len(ID_list_KO_over_ast))
     print('over list',ID_list_KO_over_ast)
 
-    ID_list_KO_under_ast = debl_rep['image_ID'][under]-1
+    ID_list_KO_under_ast = debl_analysis_table['image_ID'][under]-1
     if n_sim == 1:
         print('len non_det list', len(ID_list_KO_under_ast))
         print('non_det', ID_list_KO_under_ast)
@@ -168,4 +175,10 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
         print('under list', ID_list_KO_under_ast)
     print('------------------------------------------------')
     print()
-    return debl_rep,candidate_df
+    debl_stats = np.zeros(1, dtype=[('frac_debl_OK', 'f4'),
+                                    ('frac_debl_OK_th', 'f4'),
+                                    ('frac_underdebl', 'f4'),
+                                    ('frac_overdebl', 'f4')])
+
+    debl_stats[0]=(det_ok_frac,frac_ok_th,under_frac,over_frac)
+    return debl_analysis_table,candidate_df,debl_stats
