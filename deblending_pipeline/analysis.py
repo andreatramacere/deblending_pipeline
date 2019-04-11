@@ -141,7 +141,7 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
 def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
 
     if debl_filter is not None:
-        debl_analysis_table=debl_filter.loc[debl_filter.values]
+        debl_analysis_table=debl_analysis_table.loc[debl_filter.values]
 
     print('filtered size for debl filter', debl_analysis_table.size)
     failed = (debl_analysis_table['failed']==True)
