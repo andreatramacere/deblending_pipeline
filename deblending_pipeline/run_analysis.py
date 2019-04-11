@@ -107,7 +107,7 @@ class DataSetAnalysis(object):
             self.debl_map_sex = pf.getdata(segmap_debl_file)
 
     @classmethod
-    def from_name_factory(cls,name,root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag,ast_name,mag=None):
+    def from_name_factory(cls,name,root_rel_path, debl_method, debl_segmethod, ast_flag, sex_flag,ast_name,mag_cut=None):
         _dict={}
         _dict['couple_skymaker_r1'] = cls.build_couple_skymaker_r1
         _dict['couple_skymaker_r5'] = cls.build_couple_skymaker_r5
@@ -118,12 +118,12 @@ class DataSetAnalysis(object):
         _dict['couple_big_skymaker_r10'] = cls.build_couple_big_skymaker_r10
         _dict['couple_big_CANDELS_r10'] = cls.build_couple_big_CANDELS_r10
 
-        return _dict[name](root_rel_path, debl_method, debl_segmethod, ast_flag,ast_name, sex_flag,mag=mag)
+        return _dict[name](root_rel_path, debl_method, debl_segmethod, ast_flag,ast_name, sex_flag,mag_cut=mag_cut)
 
 
 
     @classmethod
-    def build_couple_skymaker_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,ast_name, sex_flag,mag=None):
+    def build_couple_skymaker_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,ast_name, sex_flag,mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r1',
@@ -138,12 +138,12 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='r1_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag)
+                mag_cut=mag_cut)
 
         return d
 
     @classmethod
-    def build_couple_skymaker_r5(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, ast_name,sex_flag, mag=None):
+    def build_couple_skymaker_r5(cls, root_rel_path, debl_method, debl_segmethod, ast_flag, ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r5',
@@ -158,12 +158,12 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='r5_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag)
+                mag_cut=mag_cut)
 
         return d
 
     @classmethod
-    def build_couple_CANDELS_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag=None):
+    def build_couple_CANDELS_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r1',
@@ -178,12 +178,12 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='r1_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag)
+                mag_cut=mag_cut)
 
         return d
 
     @classmethod
-    def build_couple_CANDELS_r5(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag=None):
+    def build_couple_CANDELS_r5(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r5',
@@ -198,12 +198,12 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='r5_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag)
+                mag_cut=mag_cut)
 
         return d
 
     @classmethod
-    def build_single_skymaker_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag=None):
+    def build_single_skymaker_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='single_19_26_24.5_d10_r1',
@@ -218,12 +218,12 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='r1_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag,
+                mag_cut=mag_cut,
                 n_sim=1)
         return d
 
     @classmethod
-    def build_single_CANDELS_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag=None):
+    def build_single_CANDELS_r1(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='single_19_26_24.5_d10_r1',
@@ -238,14 +238,14 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='r1_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag,
+                mag_cut=mag_cut,
                 n_sim=1)
 
         return d
 
 
     @classmethod
-    def build_couple_big_skymaker_r10(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag=None):
+    def build_couple_big_skymaker_r10(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='big_19_23_24.5_d50_r10',
@@ -260,12 +260,12 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='big_r10_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag)
+                mag_cut=mag_cut)
 
         return d
 
     @classmethod
-    def build_couple_big_CANDELS_r10(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag=None):
+    def build_couple_big_CANDELS_r10(cls, root_rel_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='big_19_23_24.5_d50_r10',
@@ -280,7 +280,7 @@ class DataSetAnalysis(object):
                 sex_path_debl_1='big_r10_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
-                mag=mag)
+                mag_cut=mag_cut)
 
         return d
 
