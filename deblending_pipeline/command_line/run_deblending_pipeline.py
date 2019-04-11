@@ -60,6 +60,7 @@ def run_deblending_detection(dsd,
     print('run deblending detection')
 
     dsd.run_detection(conf_file,
+                  dsd.name,
                   root_ast,
                   h_min,
                   h_max,
@@ -164,7 +165,7 @@ def run_asterism(set_name,
                                 downsampling)
     if run_detection is True:
 
-        wd=dsd.get_wd(root_ast_detection,dsd.data_flag,method,denclue_segm_method)
+        wd=dsd.get_wd(root_ast_detection,dsd.data_flag,dsd.name,method,denclue_segm_method)
 
 
 
@@ -194,6 +195,7 @@ def run_asterism(set_name,
                                             debl_method=method,
                                             debl_segmethod='seg_%s' % denclue_segm_method,
                                             ast_flag=ast_flag,
+                                            ast_name=dsd.name,
                                             sex_flag=None,
                                             mag=mag)
 
@@ -212,7 +214,7 @@ def run_asterism(set_name,
     debl_candidate_df_file=os.path.join(analysis_path_ast,'%s_debl_candidate_table.pkl'%ast_flag)
 
     #detection pars
-    wd = dsd.get_wd(root_ast_detection, dsd.data_flag, method, denclue_segm_method)
+    wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name,method, denclue_segm_method)
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
 
     if run_candidate is True:
@@ -280,6 +282,7 @@ def run_sextractor(set_name,
                                             debl_method=None,
                                             debl_segmethod=None,
                                             ast_flag=None,
+                                            ast_name=dsd.name,
                                             sex_flag=sex_flag,
                                             mag=mag)
 
@@ -326,6 +329,7 @@ def set_datasets(set_name,root_path='./', method=None, denclue_segm_method=None,
                                          debl_method=method,
                                          debl_segmethod='seg_%s'%denclue_segm_method,
                                          ast_flag=ast_flag,
+                                         ast_name=dsd.name,
                                          sex_flag=sex_flag)
 
     print('--------')
@@ -406,6 +410,7 @@ def run(set_name,
                                                     debl_segmethod=None,
                                                     ast_flag=None,
                                                     sex_flag=sex_flag,
+                                                    ast_name=dsd.name,
                                                     mag=mag)
             _p = os.path.join(dsa.sex_deblm_map_path,'*segmentation_map_debl*')
             print('_p',_p)

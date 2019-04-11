@@ -17,6 +17,7 @@ class DataSetDetection(object):
 
     def __init__(self,root_rel_path,data_root_path,data_flag,sample_flag,sample_flag_1,segmap_root_path,name=None):
         print("Run asterism conf:",name)
+        self.name=name
         self.data_flag = data_flag
         self.sample_flag = sample_flag
         self.sample_flag_1 = sample_flag_1
@@ -125,13 +126,15 @@ class DataSetDetection(object):
     @staticmethod
     def get_wd(wd,
                data_flag,
+               name,
                method,
                denclue_segm_method):
 
-        return os.path.join(wd,data_flag,method, 'seg_%s' % denclue_segm_method)
+        return os.path.join(wd,data_flag,name,method, 'seg_%s' % denclue_segm_method)
 
     def run_detection(self,
                       conf_file,
+                      name,
                       wd,
                       h_frac_min,
                       h_frac_max,
@@ -148,6 +151,7 @@ class DataSetDetection(object):
                       log_file=None):
 
         _run_detection(cube=self.cube_file,
+                       name=name,
                        K_denclue=K_denclue,
                        conf_file=conf_file,
                        rms_file=self.rms_file,
@@ -177,6 +181,7 @@ def run_job():
 
 def _run_detection(cube,
                    conf_file,
+                   name,
                    rms_file=None,
                    segm_file=None,
                    data_flag=None,
@@ -245,7 +250,7 @@ def _run_detection(cube,
 
     #wd_flag = os.path.join(method, 'seg_%s' % denclue_segm_method)
     if wd is not None:
-        wd = DataSetDetection.get_wd(wd,data_flag,method,denclue_segm_method)
+        wd = DataSetDetection.get_wd(wd,data_flag,name,method,denclue_segm_method)
 
     pipeline.IO_conf_task.set_par('working_dir',value=wd)
 
