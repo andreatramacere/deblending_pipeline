@@ -17,7 +17,9 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
     contaminant_dict = {}
     assoc_list = []
     contaminant_list = []
-    if len(ID_sim_list)>0:
+    sel_row=candidate_df.loc[candidate_df['image_ID']==image_ID]
+    failed=np.sum(sel_row['failed'])>0
+    if len(ID_sim_list)>0 and failed:
         sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
         sim_row = candidate_df.loc[sel_row]
 
@@ -59,18 +61,19 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
                         _l.append(rec_dict)
             contaminant_dict[sim_ID] =_l
     else:
-        pass
+        failed=True
 
     if verbose is True:
         print('assoc_dict', assoc_dict)
         print('contaminant_dict', contaminant_dict)
         print('contaminant_list', contaminant_list)
-    return assoc_dict, contaminant_dict, contaminant_list, assoc_list
+    return assoc_dict, contaminant_dict, contaminant_list, assoc_list,failed
 
 
 def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, contam_th=-1, verbose=False):
     print('debl_quality_analysis', 'true map shape', true_map.shape)
     out=np.zeros(true_map.shape[0],dtype=[('image_ID', '>i4'),
+                                          ('failed','bool'),
                                           ('success_n', 'bool'),
                                           ('success_qual', 'bool'),
                                           ('overlap', 'i4'),
@@ -82,50 +85,53 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
         if verbose is True:
             print('---->  quality IMAGE',ID_img)
         
-        assoc_dict,contaminant_dict,contaminant_list,assoc_list=get_associated_and_contaminant(candidate_df,ID_img,ID_sim_list,verbose=verbose)
+        assoc_dict,contaminant_dict,contaminant_list,assoc_list,failed=get_associated_and_contaminant(candidate_df,ID_img,ID_sim_list,verbose=verbose)
         
-        n_sim = len(ID_sim_list)
-        n_assoc = len(assoc_list)
-        n_overlap = n_assoc+len(contaminant_list)
-        
-        rec_det = np.zeros(len(ID_sim_list))
-        rec_sim = np.zeros(len(ID_sim_list))
-        # cont_frac=np.zeros(n_assoc)
-        
-        contaminant_list=[]
-        # print(assoc_dict,contaminant_dict)
-       
-        for ID, ID_sim in enumerate(assoc_dict):
-            # tab_row=[ID_img,ID_sim,[_c.rec_dict[ID_sim] for _c in canditate_list]]
-            # Table.append(tab_row)
-            assoc_rec_dict=assoc_dict[ID_sim]
-            
-            if verbose is True:
-                print('---> ID_sim ', ID_sim, 'associated to det', assoc_rec_dict['det_ID'], 'n_sim', n_sim, 'assoc_list', assoc_list)
-            
-            rec_det[ID]=assoc_rec_dict['rec_det_frac']
-            rec_sim[ID]=assoc_rec_dict['rec_sim_frac']
-            if ID_sim in contaminant_dict:
+
+        if failed is False:
+            n_sim = len(ID_sim_list)
+            n_assoc = len(assoc_list)
+            n_overlap = n_assoc+len(contaminant_list)
+
+            rec_det = np.zeros(len(ID_sim_list))
+            rec_sim = np.zeros(len(ID_sim_list))
+            # cont_frac=np.zeros(n_assoc)
+
+            contaminant_list=[]
+            # print(assoc_dict,contaminant_dict)
+
+            for ID, ID_sim in enumerate(assoc_dict):
+                # tab_row=[ID_img,ID_sim,[_c.rec_dict[ID_sim] for _c in canditate_list]]
+                # Table.append(tab_row)
+                assoc_rec_dict=assoc_dict[ID_sim]
+
                 if verbose is True:
-                    print([v['rec_sim_frac'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
-                contaminant_list.extend([v['rec_sim_frac'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
-       
-        success_n = n_assoc == n_sim and len(contaminant_list) == 0
-        success_qual = success_n and np.sum(rec_sim > rec_sim_th) == n_sim
-        success_qual = success_qual and np.sum(rec_det > rec_det_th) == n_sim
-        if verbose is True:
-            print('IMG', ID_img, 'success_n', success_n, 'n_assoc', n_assoc, 'n_sim', n_sim, 'len cont', len(contaminant_list), 'n_overlap', n_overlap, 'sim', rec_sim, 'det', rec_det)
-            if success_n is True and len(contaminant_list)>0:
-                for ID,ID_sim in enumerate(assoc_dict):
-                    print('IMG', ID_img, 'len cont', len(contaminant_list), 'n_overlap', n_overlap, 'sim', rec_sim, 'det', rec_det)
-                    assoc_rec_dict = assoc_dict[ID_sim]
-                    print('sim ID', assoc_rec_dict)
-                print('----------')
-            
-        out[ID_img] = (ID_img+1,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list))
-        if verbose is True:
-            print('----> <-----')
-        # df=DataFrame(Table,columns=['image_ID', 'sim_ID', 'rec_dict_list'])
+                    print('---> ID_sim ', ID_sim, 'associated to det', assoc_rec_dict['det_ID'], 'n_sim', n_sim, 'assoc_list', assoc_list)
+
+                rec_det[ID]=assoc_rec_dict['rec_det_frac']
+                rec_sim[ID]=assoc_rec_dict['rec_sim_frac']
+                if ID_sim in contaminant_dict:
+                    if verbose is True:
+                        print([v['rec_sim_frac'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
+                    contaminant_list.extend([v['rec_sim_frac'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
+
+            success_n = n_assoc == n_sim and len(contaminant_list) == 0
+            success_qual = success_n and np.sum(rec_sim > rec_sim_th) == n_sim
+            success_qual = success_qual and np.sum(rec_det > rec_det_th) == n_sim
+            if verbose is True:
+                print('IMG', ID_img, 'success_n', success_n, 'n_assoc', n_assoc, 'n_sim', n_sim, 'len cont', len(contaminant_list), 'n_overlap', n_overlap, 'sim', rec_sim, 'det', rec_det)
+                if success_n is True and len(contaminant_list)>0:
+                    for ID,ID_sim in enumerate(assoc_dict):
+                        print('IMG', ID_img, 'len cont', len(contaminant_list), 'n_overlap', n_overlap, 'sim', rec_sim, 'det', rec_det)
+                        assoc_rec_dict = assoc_dict[ID_sim]
+                        print('sim ID', assoc_rec_dict)
+                    print('----------')
+
+            out[ID_img] = (ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list))
+            if verbose is True:
+                print('----> <-----')
+        else:
+            out[ID_img] = (ID_img + 1, failed, -1, -1, -1, -1, 0)
     return out
 
 

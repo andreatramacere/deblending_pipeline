@@ -267,13 +267,15 @@ def build_candidate_df(cube,true_map,deblended_map,overlap_th=-1,verbose=False):
             print('---->  build candidate IMAGE',ID_img)
         
         for ID,ID_sim in enumerate(ID_sim_list):
+            failed=False
             try:
                 canditate_list=build_candidate_list(cube[ID_img],true_map[ID_img],deblended_map[ID_img],ID_sim,ID_det_overlap_list,verbose=verbose,image_ID=ID_img)
-                tab_row=[ID_img,ID_sim,ID_det_overlap_list,[_c.rec_dict[ID_sim] for _c in canditate_list]]
+                tab_row=[ID_img,failed,ID_sim,ID_det_overlap_list,[_c.rec_dict[ID_sim] for _c in canditate_list]]
             except:
-                tab_row=[ID_img,ID_sim,[],[]]
+                failed=True
+                tab_row=[ID_img,failed,ID_sim,[],[]]
             Table.append(tab_row)
         
-        df=DataFrame(Table,columns=['image_ID', 'sim_ID','ID_det_list', 'rec_dict_list'])
+        df=DataFrame(Table,columns=['image_ID','failed', 'sim_ID','ID_det_list', 'rec_dict_list'])
     return df
 
