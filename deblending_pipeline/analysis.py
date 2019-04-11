@@ -75,13 +75,14 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
 
 def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, contam_th=-1, verbose=False):
     print('debl_quality_analysis', 'true map shape', true_map.shape)
-    out=np.zeros(true_map.shape[0],dtype=[('image_ID', '>i4'),
-                                          ('failed','bool'),
-                                          ('success_n', 'bool'),
-                                          ('success_qual', 'bool'),
-                                          ('overlap', 'i4'),
-                                          ('assoc', 'i4'),
-                                          ('contaminant', 'i4')])
+    #out=np.zeros(true_map.shape[0],dtype=[('image_ID', '>i4'),
+    #                                      ('failed','bool'),
+    #                                      ('success_n', 'bool'),
+    #                                      ('success_qual', 'bool'),
+    #                                      ('overlap', 'i4'),
+    #                                      ('assoc', 'i4'),
+    #                                      ('contaminant', 'i4')])
+    out=[]
     for ID_img,tm in enumerate(true_map):
         
         ID_sim_list = np.unique(true_map[ID_img][true_map[ID_img] > 0]).astype(np.int)
@@ -130,12 +131,12 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
                         print('sim ID', assoc_rec_dict)
                     print('----------')
 
-            out[ID_img] = (ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list))
+                    out.append([ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list)])
             if verbose is True:
                 print('----> <-----')
         else:
-            out[ID_img] = (ID_img + 1, failed, -1, -1, -1, -1, 0)
-    return DataFrame(out)
+            out.append([ID_img + 1, failed, -1, -1, -1, -1, 0])
+    return DataFrame(out,columns=['image_ID','failed', 'success_n','success_qual', 'overlap','assoc','contaminant'])
 
 def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
 
