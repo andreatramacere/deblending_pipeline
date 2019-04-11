@@ -142,24 +142,24 @@ def run_asterism(set_name,
         valid_sig_th=1.5,
         valid_overlap_max=0.85,
         method='denclue',
-        #method='extrema'
+        # method='extrema'
         denclue_segm_method='denclue',
-        #denclue_segm_method='watershed'
+        # denclue_segm_method='watershed'
         rec_sim_th=0.1,
         rec_det_th=-1,
         contam_th=-1,
-        #overlap_th=-1
+        # overlap_th=-1
         mag=25.3):
 
     sig_pars=locals()
-    #root_sex_analysis=os.path.join(root_path,root_sex_analysis)
+    # root_sex_analysis=os.path.join(root_path,root_sex_analysis)
     root_ast_detection=os.path.join(root_path,root_ast_detection)
     root_ast_analysis=os.path.join(root_path,root_ast_analysis)
 
-    #dsd=DataSetDetection.from_name_factory(set_name,root_path)
+    # dsd=DataSetDetection.from_name_factory(set_name,root_path)
     print('run asterism pipeline',locals())
     # asterism
-    #if only_sex is False:
+    # if only_sex is False:
     ast_flag = dsd.get_run_flag(h_min, h_max, K_denclue, validation, valid_abs_size_th, valid_sig_th,
                                 valid_overlap_max,
                                 downsampling)
@@ -170,7 +170,7 @@ def run_asterism(set_name,
 
 
         log_file=os.path.join(wd,'%s.log'%ast_flag)
-
+        print('run asterism pipeline wd',wd)
         run_deblending_detection(dsd,
                                  conf_file,
                                  root_ast_detection,
@@ -208,12 +208,12 @@ def run_asterism(set_name,
 
 
     analysis_path_ast = os.path.join(root_ast_analysis, dsd.data_flag, set_name, method, 'seg_%s' % denclue_segm_method)
-    #if only_sex is False:
+    # if only_sex is False:
 
     os.makedirs(analysis_path_ast,exist_ok=True)
     debl_candidate_df_file=os.path.join(analysis_path_ast,'%s_debl_candidate_table.pkl'%ast_flag)
 
-    #detection pars
+    # detection pars
     wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name,method, denclue_segm_method)
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
 
@@ -239,8 +239,8 @@ def run_asterism(set_name,
         with open(par_file, 'r') as fp:
             pars = json.load(fp)
         print('detection pars', pars)
-        #df_pars=pandas.DataFrame(pars)
-        #df_analysis_stats=pandas.concat([df_pars,df_stats], axis=1, sort=False)
+        # df_pars=pandas.DataFrame(pars)
+        # df_analysis_stats=pandas.concat([df_pars,df_stats], axis=1, sort=False)
         for kp in pars.keys():
            if kp in sig_pars.keys():
                df_analysis_stats[kp]=pars[kp]
@@ -269,8 +269,8 @@ def run_sextractor(set_name,
     Nthr = sex_flag.split('_')[1]
     Min = sex_flag.split('_')[3]
     root_sex_analysis=os.path.join(root_path,root_sex_analysis)
-    #root_ast_detection=os.path.join(root_path,root_ast_detection)
-    #root_ast_analysis=os.path.join(root_path,root_ast_analysis)
+    # root_ast_detection=os.path.join(root_path,root_ast_detection)
+    # root_ast_analysis=os.path.join(root_path,root_ast_analysis)
 
     #dsd=DataSetDetection.from_name_factory(set_name,root_path)
 

@@ -6,50 +6,61 @@ __author__ = "Andrea Tramacere"
 
 def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=False):
     #print('---> image_ID',image_ID)
-    #print(ID_sim_list,candidate_df['sim_ID']==ID_sim_list[0],candidate_df['image_ID']==image_ID)
+    #print(ID_sim_list[0],
+    #      np.sum(candidate_df['sim_ID']==ID_sim_list[0]),
+    #      np.sum(candidate_df['image_ID']==image_ID),
+    #      np.sum(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID)),
+    #      np.argwhere(np.logical_and(candidate_df['sim_ID'] == ID_sim_list[0], candidate_df['image_ID'] == image_ID))
+    #      )
+
     assoc_dict = {}
-    assoc_list = []
-    sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
-    sim_row = candidate_df.loc[sel_row]
-    
-    contaminant_list=sim_row['ID_det_list'].tolist()
-    # if verbose==True:
-    #    print('gett assoc cont for image ->',image_ID,'sim_list',ID_sim_list,contaminant_list)
-    # print(type(sim_row))
-    for sim_ID in ID_sim_list:
-        sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
-        sim_row = candidate_df.loc[sel_row]
-        # sim_row= df.loc[df['sim_ID']==sim_ID]
-        # if verbose==True:
-        #   print('sim_row ->',sim_row['rec_dict_list'])
-        #    for rec_dict in sim_row['rec_dict_list']:
-        #        print('rec_dict',rec_dict['dist'])
-        
-        # print('ID sim',sim_ID)
-        dist=[rec_dict['dist'] for rec_dict in sim_row['rec_dict_list'] ]
-        
-        # dist, cl_ID_list=get_cluster_distance_to_clusters_list(sim_cl,det_cl_list)
-        #
-        if len(dist)>0:
-            _selected=np.argmin(dist)
-            # print('dist',dist,_selected,sim_row['rec_dict_list'][_selected]['det_ID'])
-            assoc_dict[sim_ID]=sim_row['rec_dict_list'][_selected]
-            # contaminant_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
-            if sim_row['rec_dict_list'][_selected]['det_ID'] in contaminant_list:
-                contaminant_list.remove(sim_row['rec_dict_list'][_selected]['det_ID'])
-                assoc_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
-    
     contaminant_dict = {}
-    for sim_ID in ID_sim_list:
-        sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+    assoc_list = []
+    contaminant_list = []
+    if len(ID_sim_list)>0:
+        sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
         sim_row = candidate_df.loc[sel_row]
-        _l = []
-        # print(sim_row.keys())
-        for rec_dict in sim_row['rec_dict_list']:
-            if rec_dict['det_ID'] in contaminant_list:
-                    _l.append(rec_dict)
-        contaminant_dict[sim_ID] =_l
-                        
+
+        contaminant_list=sim_row['ID_det_list'].tolist()
+        # if verbose==True:
+        #    print('gett assoc cont for image ->',image_ID,'sim_list',ID_sim_list,contaminant_list)
+        # print(type(sim_row))
+        for sim_ID in ID_sim_list:
+            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+            sim_row = candidate_df.loc[sel_row]
+            # sim_row= df.loc[df['sim_ID']==sim_ID]
+            # if verbose==True:
+            #   print('sim_row ->',sim_row['rec_dict_list'])
+            #    for rec_dict in sim_row['rec_dict_list']:
+            #        print('rec_dict',rec_dict['dist'])
+
+            # print('ID sim',sim_ID)
+            dist=[rec_dict['dist'] for rec_dict in sim_row['rec_dict_list'] ]
+
+            # dist, cl_ID_list=get_cluster_distance_to_clusters_list(sim_cl,det_cl_list)
+            #
+            if len(dist)>0:
+                _selected=np.argmin(dist)
+                # print('dist',dist,_selected,sim_row['rec_dict_list'][_selected]['det_ID'])
+                assoc_dict[sim_ID]=sim_row['rec_dict_list'][_selected]
+                # contaminant_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
+                if sim_row['rec_dict_list'][_selected]['det_ID'] in contaminant_list:
+                    contaminant_list.remove(sim_row['rec_dict_list'][_selected]['det_ID'])
+                    assoc_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
+
+
+        for sim_ID in ID_sim_list:
+            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+            sim_row = candidate_df.loc[sel_row]
+            _l = []
+            # print(sim_row.keys())
+            for rec_dict in sim_row['rec_dict_list']:
+                if rec_dict['det_ID'] in contaminant_list:
+                        _l.append(rec_dict)
+            contaminant_dict[sim_ID] =_l
+    else:
+        pass
+
     if verbose is True:
         print('assoc_dict', assoc_dict)
         print('contaminant_dict', contaminant_dict)

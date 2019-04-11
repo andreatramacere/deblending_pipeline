@@ -42,7 +42,7 @@ def get_cluster_distance_to_clusters_list(cluster,clusters_list):
 
 
 
-def detect_cluster_with_overlap(image,input_seg_map_overlap,ID_target):
+def detect_cluster_with_overlap(image,input_seg_map_overlap,ID_target,image_ID):
     """This function detects a cluster with ID==ID_target strating from a segmap with overlappin ID (-1)
     Pixels with  ID==-1 and continguos to pixels with ID==ID_target are merged together 
     and the corresponding cluster is detected
@@ -107,7 +107,7 @@ def detect_cluster_with_overlap(image,input_seg_map_overlap,ID_target):
         _cl_list=[_cl_list[_selected_ID]]
         slected_cl=_cl_list[0]
     else:
-        raise RuntimeError('the segmpa connected islands  have not been detected',len(_cl_list),ID_target)
+        raise RuntimeError('the segmap connected islands  have not been detected',len(_cl_list),'target ID',ID_target,'image_ID',image_ID)
     
     #we update the seg_map_contig keeping only pixels from slected_cl
     seg_map_contig[seg_map_contig!=slected_cl.ID]=0
@@ -135,7 +135,7 @@ def detect_cluster_with_overlap(image,input_seg_map_overlap,ID_target):
    
     return seg_map_contig,_cl_list
 
-def build_candidate_list(image,true_map,deblended_map,ID_sim,ID_det_overlap_list,verbose=False,plot=False):
+def build_candidate_list(image,true_map,deblended_map,ID_sim,ID_det_overlap_list,verbose=False,plot=False,image_ID=None):
     """[summary]
     
     Parameters
@@ -174,7 +174,7 @@ def build_candidate_list(image,true_map,deblended_map,ID_sim,ID_det_overlap_list
     
     #sim_cl_list=[]  
     #for ID_sim in ID_sim_list:
-    seg_map_overlapped,sim_cl_list= detect_cluster_with_overlap(img,true_map,ID_sim)
+    seg_map_overlapped,sim_cl_list= detect_cluster_with_overlap(img,true_map,ID_sim,image_ID)
     #sim_cl_list.extend(_cl_list)
     if len(sim_cl_list)==0 or len(sim_cl_list)>1:
         raise RuntimeError('the cluster has not been detected or more than one have been detected',len(sim_cl_list))
@@ -183,7 +183,7 @@ def build_candidate_list(image,true_map,deblended_map,ID_sim,ID_det_overlap_list
     det_cl_list=[]
     for ID_det in ID_det_overlap_list:
           
-        seg_map_overlapped,_cl_list= detect_cluster_with_overlap(img,deblended_map,ID_det)
+        seg_map_overlapped,_cl_list= detect_cluster_with_overlap(img,deblended_map,ID_det,image_ID)
         if len(_cl_list)!=1:
             raise  RuntimeError('the cluster has not been detected or more than one have been detected',len(_cl_list),ID_det)
         cl_det=_cl_list[0]
@@ -267,7 +267,7 @@ def build_candidate_df(cube,true_map,deblended_map,overlap_th=-1,verbose=False):
             print('---->  build candidate IMAGE',ID_img)
         
         for ID,ID_sim in enumerate(ID_sim_list):
-            canditate_list=build_candidate_list(cube[ID_img],true_map[ID_img],deblended_map[ID_img],ID_sim,ID_det_overlap_list,verbose=verbose)
+            canditate_list=build_candidate_list(cube[ID_img],true_map[ID_img],deblended_map[ID_img],ID_sim,ID_det_overlap_list,verbose=verbose,image_ID=ID_img)
             tab_row=[ID_img,ID_sim,ID_det_overlap_list,[_c.rec_dict[ID_sim] for _c in canditate_list]]
             Table.append(tab_row)
         

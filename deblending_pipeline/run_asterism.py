@@ -58,7 +58,7 @@ class DataSetDetection(object):
         _dict['couple_CANDELS_r1'] = cls.build_couple_CANDELS_r1
         _dict['couple_CANDELS_r5'] = cls.build_couple_CANDELS_r5
         _dict['single_skymaker_r1'] = cls.build_single_skymaker_r1
-        _dict['single_CANDELS_r1'] = cls.build_single_skymaker_r1
+        _dict['single_CANDELS_r1'] = cls.build_single_CANDELS_r1
         _dict['couple_big_skymaker_r10'] = cls.build_couple_big_skymaker_r10
         _dict['couple_big_CANDELS_r10'] = cls.build_couple_big_CANDELS_r10
 
