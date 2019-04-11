@@ -155,17 +155,17 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
         over=debl_analysis_table['contaminant']>0
         under=debl_analysis_table['assoc']<n_sim
         non_det=debl_analysis_table['overlap']<1
-
+        n_failed=np.sum(debl_analysis_table['failed'])
         det_ok_frac=debl_analysis_table['success_n'].sum()/debl_analysis_table['image_ID'].size
 
         frac_ok_th=debl_analysis_table['success_qual'].sum()/debl_analysis_table['image_ID'].size
-        frac_ok_th_real=debl_analysis_table['success_qual'].sum()/(debl_analysis_table['image_ID'].size-non_det.sum())
+        frac_ok_th_real=debl_analysis_table['success_qual'].sum()/(debl_analysis_table['image_ID'].size-non_det.sum()-n_failed)
 
         over_frac=over.sum()/debl_analysis_table['image_ID'].size
         under_frac=under.sum()/debl_analysis_table['image_ID'].size
 
-        over_frac_real=over.sum()/(debl_analysis_table['image_ID'].size-non_det.sum())
-        under_frac_real=under.sum()/(debl_analysis_table['image_ID'].size-non_det.sum())
+        over_frac_real=over.sum()/(debl_analysis_table['image_ID'].size-non_det.sum()-n_failed)
+        under_frac_real=under.sum()/(debl_analysis_table['image_ID'].size-non_det.sum()-n_failed)
         if n_sim==1:
             under_frac=None
             under_frac_real=None
@@ -175,12 +175,14 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
                '\nfraction of underdebl      ',under_frac,
                '\nfraction of overdebl       ',over_frac,
                '\nfraction of non-detected   ',non_det.sum()/debl_analysis_table['image_ID'].size,
+               '\nfraction of failed  ', non_det.sum() / debl_analysis_table['image_ID'].size,
                # '\nspurious (not in true map) ',debl_analysis_table['found'].sum()-debl_analysis_table['overlap'].sum(),
-               '\nfraction of debl OK>th     (excluding non-detected)',frac_ok_th_real,
-               '\nfraction of underdebl      (excluding non-detected)',under_frac_real,
-               '\nfraction of overdebl       (excluding non-detected)',over_frac_real)
+               '\nfraction of debl OK>th     (excluding non-detected/failed)',frac_ok_th_real,
+               '\nfraction of underdebl      (excluding non-detected/failed)',under_frac_real,
+               '\nfraction of overdebl       (excluding non-detected/failed)',over_frac_real)
 
         print()
+        
         ID_list_KO_over_ast = debl_analysis_table['image_ID'][over]-1
         print('len over list',len(ID_list_KO_over_ast))
         print('over list',ID_list_KO_over_ast)
