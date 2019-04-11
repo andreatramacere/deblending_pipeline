@@ -155,17 +155,19 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
         over=debl_analysis_table['contaminant']>0
         under=debl_analysis_table['assoc']<n_sim
         non_det=debl_analysis_table['overlap']<1
-        n_failed=np.sum(debl_analysis_table['failed'])
+        failed=debl_analysis_table['failed']
+
+        net_count=debl_analysis_table['image_ID'].size-np.logical_or(non_det,failed).sum()
         det_ok_frac=debl_analysis_table['success_n'].sum()/debl_analysis_table['image_ID'].size
 
         frac_ok_th=debl_analysis_table['success_qual'].sum()/debl_analysis_table['image_ID'].size
-        frac_ok_th_real=debl_analysis_table['success_qual'].sum()/(debl_analysis_table['image_ID'].size-non_det.sum()-n_failed)
+        frac_ok_th_real=debl_analysis_table['success_qual'].sum()/(net_count)
 
         over_frac=over.sum()/debl_analysis_table['image_ID'].size
         under_frac=under.sum()/debl_analysis_table['image_ID'].size
 
-        over_frac_real=over.sum()/(debl_analysis_table['image_ID'].size-non_det.sum()-n_failed)
-        under_frac_real=under.sum()/(debl_analysis_table['image_ID'].size-non_det.sum()-n_failed)
+        over_frac_real=over.sum()/(net_count)
+        under_frac_real=under.sum()/(net_count)
         if n_sim==1:
             under_frac=None
             under_frac_real=None
@@ -182,7 +184,7 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
                '\nfraction of overdebl       (excluding non-detected/failed)',over_frac_real)
 
         print()
-        
+
         ID_list_KO_over_ast = debl_analysis_table['image_ID'][over]-1
         print('len over list',len(ID_list_KO_over_ast))
         print('over list',ID_list_KO_over_ast)
