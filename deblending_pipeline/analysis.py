@@ -1,4 +1,6 @@
 import numpy as np
+from pandas import DataFrame
+
 from .table import build_candidate_df
 
 __author__ = "Andrea Tramacere"
@@ -133,7 +135,7 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
                 print('----> <-----')
         else:
             out[ID_img] = (ID_img + 1, failed, -1, -1, -1, -1, 0)
-    return out
+    return DataFrame(out)
 
 def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
 
@@ -213,7 +215,7 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
 
     print('------------------------------------------------')
     print('name ',name)
-    print('candidate_df ',candidate_df)
+    #print('candidate_df ',candidate_df)
 
     if candidate_df is None:
         candidate_df=build_candidate_df(cube,true_map,debl_map,overlap_th=-1,verbose=verbose)
