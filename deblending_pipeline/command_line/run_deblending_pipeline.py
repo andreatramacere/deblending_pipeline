@@ -225,11 +225,12 @@ def run_asterism(set_name,
                                                         max_image_id=max_image_id)
 
         debl_candidate_df.to_pickle(debl_candidate_df_file)
-    else:
-        debl_candidate_df=pd.read_pickle(debl_candidate_df_file)
-
-
+  
     if run_analysis is True:
+        if run_candidate is False:
+            debl_candidate_df = pd.read_pickle(debl_candidate_df_file)
+
+
         debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,ast_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=mag_cut,max_image_id=max_image_id)
         analsys_file_ast_table = os.path.join(analysis_path_ast, '%s_%s_analysis_res.pkl' % (ast_flag,analysis_flag))
         analsys_file_ast_stat = os.path.join(analysis_path_ast, '%s_%s_analysis_stats.pkl' % (ast_flag, analysis_flag))

@@ -171,11 +171,12 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
         under_frac = None
         under_frac_real = None
 
+    print('stats below are net of failed')
     print('fraction of debl OK n_det  ', det_ok_frac,
           '\nfraction of debl OK>th     ', frac_ok_th,
           '\nfraction of underdebl      ', under_frac,
           '\nfraction of overdebl       ', over_frac,
-          '\nfraction of failed/non-detected   ', 1.0 - net_count / debl_analysis_table['image_ID'].size,
+          '\nfraction of non-detected   ', 1.0 - net_count / debl_analysis_table['image_ID'].size,
           # '\nspurious (not in true map) ',debl_analysis_table['found'].sum()-debl_analysis_table['overlap'].sum(),
           '\nfraction of debl OK>th     (excluding non-detected/failed)', frac_ok_th_real,
           '\nfraction of underdebl      (excluding non-detected/failed)', under_frac_real,
