@@ -172,7 +172,7 @@ class DataSetAnalysis(object):
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
                 sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
-                sex_path_debl_1='r1_CANDELS',
+                sex_path_debl_1='r1_candels',
                 sex_flag=sex_flag,
                 mag=mag)
 
@@ -191,7 +191,7 @@ class DataSetAnalysis(object):
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',
                 sex_path_debl='deblending_detection/sextractor/segmap_debl_detthr_1.2_minarea_10',
-                sex_path_debl_1='r5_skymaker',
+                sex_path_debl_1='r5_candels',
                 sex_flag=sex_flag,
                 mag=mag)
 

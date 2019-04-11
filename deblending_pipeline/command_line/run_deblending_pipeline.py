@@ -242,7 +242,7 @@ def run_asterism(set_name,
         for kp in pars.keys():
            if kp in sig_pars.keys():
                df_analysis_stats[kp]=pars[kp]
-        pandas.to_pickle(df_analysis_stats, analsys_file_ast_stat)
+        pandas.to_pickle(df_analysis_stats  , analsys_file_ast_stat)
 
 
 
