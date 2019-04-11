@@ -31,7 +31,7 @@ class DataSetAnalysis(object):
                  n_sim=2,
                  sex_flag=None,
                  debl_segmethod='',
-                 mag=None):
+                 mag_cut=None):
 
 
         self.n_sim = n_sim
@@ -41,12 +41,12 @@ class DataSetAnalysis(object):
 
         # pandas table
         _pd=os.path.join('%s'%self.data_path, 'sky_to_CANDELS.pkl')
-        print('pandas file',os.path.exists(_pd),_pd)
+        print('simulation pandas file',os.path.exists(_pd),_pd)
         # filter
-        if os.path.exists(_pd) and mag is not None:
+        if os.path.exists(_pd) and mag_cut is not None:
             
             pd=pandas.read_pickle(_pd)
-            self.debl_filter=np.logical_and(pd['mag']<mag,pd['nearest_mag']<mag)
+            self.debl_filter=np.logical_and(pd['mag']<mag_cut,pd['nearest_mag']<mag_cut)
         else:
             self.debl_filter=None
        

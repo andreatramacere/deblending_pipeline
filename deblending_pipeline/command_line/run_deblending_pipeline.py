@@ -90,9 +90,9 @@ def run_dblending_candidate_table(dsd,dsa,max_image_id=None,sex=False):
 
 
 
-def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag=None,max_image_id=None,sex=False):
+def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=None,max_image_id=None,sex=False):
     print('run deblending analysis')
-    if mag is not None:
+    if mag_cut is not None:
         debl_filter=dsa.debl_filter[:max_image_id]
     else:
         debl_filter=None
@@ -116,7 +116,7 @@ def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th
                                   verbose=False,
                                   candidate_df=debl_candidate_df)
     
-    flag='rec_sim_th_%2.2f_rec_det_th_%2.2f_contam_th_%2.2f_mag_%2.2f'%(rec_sim_th,rec_det_th,contam_th,mag)
+    flag='rec_sim_th_%2.2f_rec_det_th_%2.2f_contam_th_%2.2f_mag_cut_%2.2f'%(rec_sim_th,rec_det_th,contam_th,mag_cut)
     return debl_analysis_table,flag,debl_stats
 
 
@@ -149,7 +149,7 @@ def run_asterism(set_name,
         rec_det_th=-1,
         contam_th=-1,
         # overlap_th=-1
-        mag=25.3):
+        mag_cut=None):
 
     sig_pars=locals()
     # root_sex_analysis=os.path.join(root_path,root_sex_analysis)
@@ -197,7 +197,7 @@ def run_asterism(set_name,
                                             ast_flag=ast_flag,
                                             ast_name=dsd.name,
                                             sex_flag=None,
-                                            mag=mag)
+                                            mag_cut=mag_cut)
 
     if run_detection is True:
         out_asterims_prods = glob.glob(os.path.join(dsa.ast_path, '%s*.fits' % ast_flag))
@@ -228,7 +228,7 @@ def run_asterism(set_name,
 
 
     if run_analysis is True:
-        debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,ast_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag=mag,max_image_id=max_image_id)
+        debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,ast_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=mag_cut,max_image_id=max_image_id)
         analsys_file_ast_table = os.path.join(analysis_path_ast, '%s_%s_analysis_res.pkl' % (ast_flag,analysis_flag))
         analsys_file_ast_stat = os.path.join(analysis_path_ast, '%s_%s_analysis_stats.pkl' % (ast_flag, analysis_flag))
 
@@ -262,7 +262,7 @@ def run_sextractor(set_name,
         rec_det_th=-1,
         contam_th=-1,
         #overlap_th=-1
-        mag=25.3,
+        mag_cut=None,
         sex_flag='DebNthr_64_DebMin_0.0001'):
 
     print('run sextractor pipeline', 'flag',sex_flag)
@@ -284,7 +284,7 @@ def run_sextractor(set_name,
                                             ast_flag=None,
                                             ast_name=dsd.name,
                                             sex_flag=sex_flag,
-                                            mag=mag)
+                                            mag_cut=mag_cut)
 
 
 
@@ -309,7 +309,7 @@ def run_sextractor(set_name,
 
     if run_analysis is True:
 
-        debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,sex_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag=mag,max_image_id=max_image_id,sex=True)
+        debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,sex_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=mag_cut,max_image_id=max_image_id,sex=True)
         analsys_file_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_res.pkl' % (sex_flag, analysis_flag))
         analsys_file_ast_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_stats.pkl' % (sex_flag, analysis_flag))
         df = DataFrame(debl_analysis_table)
@@ -375,7 +375,7 @@ def run(set_name,
         rec_det_th=-1,
         contam_th=-1,
         #overlap_th=-1
-        mag=25.3,
+        mag_cut=None,
         sex_flag=None):
 
 
@@ -411,7 +411,7 @@ def run(set_name,
                                                     ast_flag=None,
                                                     sex_flag=sex_flag,
                                                     ast_name=dsd.name,
-                                                    mag=mag)
+                                                    mag_cut=mag_cut)
             _p = os.path.join(dsa.sex_deblm_map_path,'*segmentation_map_debl*')
             print('_p',_p)
             _fl = glob.glob(_p)
@@ -459,7 +459,7 @@ def main(argv=None):
     parser.add_argument('-rec_sim_th', type=float, default=-1.0, help='')
     parser.add_argument('-rec_det_th', type=float, default=-1.0, help='')
     parser.add_argument('-contam_th', type=float, default=-1.0, help='')
-    parser.add_argument('-mag', type=float, default=25.3, help='mag cut')
+    parser.add_argument('-mag_cut', type=float, default=None, help='mag cut')
     parser.add_argument('-sex_flag', type=str, default=None)
 
     args = parser.parse_args()
