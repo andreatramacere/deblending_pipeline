@@ -212,7 +212,8 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
 def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None, rec_sim_th=-1, rec_det_th=-1, overlap_th=1, contam_th=-1, verbose=False,candidate_df=None):
 
     print('------------------------------------------------')
-    print('%s'%name)
+    print('name ',name)
+    print('candidate_df ',candidate_df)
 
     if candidate_df is None:
         candidate_df=build_candidate_df(cube,true_map,debl_map,overlap_th=-1,verbose=verbose)
