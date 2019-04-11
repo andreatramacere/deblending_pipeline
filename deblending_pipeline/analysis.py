@@ -142,6 +142,10 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
 
     print('filtered size for debl filter', debl_analysis_table.size)
     failed = debl_analysis_table['failed']
+    print('failed      ', failed.sum())
+    if failed.sum()>0:
+        print('failed list', debl_analysis_table['image_ID'][failed] - 1)
+    print()
     debl_analysis_table=debl_analysis_table[~failed]
     print('filtered size for failed', debl_analysis_table.size)
     over = debl_analysis_table['contaminant'] > 0
@@ -179,8 +183,6 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
 
     print()
     print('non detected', non_det.sum())
-    print('failed      ', failed.sum())
-    print('failed list',debl_analysis_table['image_ID'][failed] - 1)
 
     ID_list_KO_over_ast = debl_analysis_table['image_ID'][over] - 1
     print('len over list', len(ID_list_KO_over_ast))
@@ -220,9 +222,9 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
 
 
 
-    try:
-        debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter)
-    except:
-        debl_stats=[-1,-1,-1,-1,-1,-1,-1]
+
+    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter)
+
+    #debl_stats=[-1,-1,-1,-1,-1,-1,-1]
 
     return debl_analysis_table,candidate_df,debl_stats
