@@ -46,7 +46,7 @@ class DataSetAnalysis(object):
         if os.path.exists(_pd) and mag_cut is not None:
             
             pd=pandas.read_pickle(_pd)
-            self.debl_filter=np.logical_and(pd['mag']<mag_cut,pd['nearest_mag']<mag_cut)
+            self.debl_filter=((pd['mag']<mag_cut)&(pd['nearest_mag']<mag_cut))
         else:
             self.debl_filter=None
        
