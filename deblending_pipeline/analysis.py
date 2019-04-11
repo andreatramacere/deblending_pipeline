@@ -176,8 +176,7 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
                '\nfraction of debl OK>th     ',frac_ok_th,
                '\nfraction of underdebl      ',under_frac,
                '\nfraction of overdebl       ',over_frac,
-               '\nfraction of non-detected   ',non_det.sum()/debl_analysis_table['image_ID'].size,
-               '\nfraction of failed  ', non_det.sum() / debl_analysis_table['image_ID'].size,
+               '\nfraction of failed/non-detected   ',1.0-net_count/debl_analysis_table['image_ID'].size,
                # '\nspurious (not in true map) ',debl_analysis_table['found'].sum()-debl_analysis_table['overlap'].sum(),
                '\nfraction of debl OK>th     (excluding non-detected/failed)',frac_ok_th_real,
                '\nfraction of underdebl      (excluding non-detected/failed)',under_frac_real,
@@ -192,7 +191,7 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
         ID_list_KO_under_ast = debl_analysis_table['image_ID'][under]-1
         if n_sim == 1:
             print('len non_det list', len(ID_list_KO_under_ast))
-            print('non_det', ID_list_KO_under_ast)
+            print('non_det/failed', ID_list_KO_under_ast)
         else:
             print('len under list', len(ID_list_KO_under_ast))
             print('under list', ID_list_KO_under_ast)
