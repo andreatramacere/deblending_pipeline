@@ -19,7 +19,7 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
     contaminant_list = []
     sel_row=candidate_df.loc[candidate_df['image_ID']==image_ID]
     failed=np.sum(sel_row['failed'])>0
-    if len(ID_sim_list)>0 and failed:
+    if len(ID_sim_list)>0 and failed is False:
         sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
         sim_row = candidate_df.loc[sel_row]
 
