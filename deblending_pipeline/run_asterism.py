@@ -205,7 +205,7 @@ def _run_detection(cube,
 
     pars_dict=locals()
 
-
+    print('asterism start')
     pipeline = SrcDetectionPipeline(parser=None, argv=None, conf_file=conf_file)
 
     # pipeline.dump_configuration_file('pipeline.conf')
@@ -289,16 +289,13 @@ def _run_detection(cube,
     pipeline.do_src_detection.cluster_scale_finder.set_par('h_max_frac', value=np.float(h_frac_max))
     par_file = os.path.join(wd, '%s_par.json' % flag)
     # print('par_file', par_file)
-    products_collection = pipeline.run()
+
     with open(par_file, 'w') as fp:
         json.dump(pars_dict, fp)
     products_collection = pipeline.run()
 
-
-
-
     pipeline.dump_configuration_file(flag+'.conf')
-
+    print('asterism stop')
 
 def from_cl(argv=None):
 

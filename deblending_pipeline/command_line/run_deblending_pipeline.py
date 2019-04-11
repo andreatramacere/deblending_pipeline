@@ -225,7 +225,7 @@ def run_asterism(set_name,
                                                         max_image_id=max_image_id)
 
         debl_candidate_df.to_pickle(debl_candidate_df_file)
-  
+
     if run_analysis is True:
         if run_candidate is False:
             debl_candidate_df = pd.read_pickle(debl_candidate_df_file)
