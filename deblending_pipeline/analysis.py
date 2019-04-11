@@ -188,11 +188,11 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
     print()
     print('non detected', non_det.sum())
 
-    ID_list_KO_over_ast = debl_analysis_table['image_ID'][over] - 1
+    ID_list_KO_over_ast = list(debl_analysis_table['image_ID'][over].values - 1)
     print('len over list', len(ID_list_KO_over_ast))
     print('over list', ID_list_KO_over_ast)
 
-    ID_list_KO_under_ast = debl_analysis_table['image_ID'][under] - 1
+    ID_list_KO_under_ast = list(debl_analysis_table['image_ID'][under].values - 1)
     if n_sim == 1:
         print('len non_det list', len(ID_list_KO_under_ast))
         print('non_det/failed', ID_list_KO_under_ast)
