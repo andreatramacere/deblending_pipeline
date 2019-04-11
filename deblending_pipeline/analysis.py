@@ -131,7 +131,7 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
                         print('sim ID', assoc_rec_dict)
                     print('----------')
 
-                    out.append([ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list)])
+            out.append([ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list)])
             if verbose is True:
                 print('----> <-----')
         else:
