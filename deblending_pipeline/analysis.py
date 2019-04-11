@@ -135,6 +135,76 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
             out[ID_img] = (ID_img + 1, failed, -1, -1, -1, -1, 0)
     return out
 
+def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
+
+    if debl_filter is not None:
+        debl_analysis_table=debl_filter[debl_filter]
+
+    print('filtered size for debl filter', debl_analysis_table.size)
+    failed = debl_analysis_table['failed']
+    debl_analysis_table=debl_analysis_table[~failed]
+    print('filtered size for failed', debl_analysis_table.size)
+    over = debl_analysis_table['contaminant'] > 0
+    under = debl_analysis_table['assoc'] < n_sim
+    # non det<1 and not failed
+    # need to remove failed from det<1, because det=-1 for failed
+    non_det =  debl_analysis_table['overlap'] < 1
+
+
+
+    net_count = debl_analysis_table['image_ID'].size - non_det.sum()
+    det_ok_frac = debl_analysis_table['success_n'].sum() / debl_analysis_table['image_ID'].size
+
+    frac_ok_th = debl_analysis_table['success_qual'].sum() / debl_analysis_table['image_ID'].size
+    frac_ok_th_real = debl_analysis_table['success_qual'].sum() / (net_count)
+
+    over_frac = over.sum() / debl_analysis_table['image_ID'].size
+    under_frac = under.sum() / debl_analysis_table['image_ID'].size
+
+    over_frac_real = over.sum() / (net_count)
+    under_frac_real = under.sum() / (net_count)
+    if n_sim == 1:
+        under_frac = None
+        under_frac_real = None
+
+    print('fraction of debl OK n_det  ', det_ok_frac,
+          '\nfraction of debl OK>th     ', frac_ok_th,
+          '\nfraction of underdebl      ', under_frac,
+          '\nfraction of overdebl       ', over_frac,
+          '\nfraction of failed/non-detected   ', 1.0 - net_count / debl_analysis_table['image_ID'].size,
+          # '\nspurious (not in true map) ',debl_analysis_table['found'].sum()-debl_analysis_table['overlap'].sum(),
+          '\nfraction of debl OK>th     (excluding non-detected/failed)', frac_ok_th_real,
+          '\nfraction of underdebl      (excluding non-detected/failed)', under_frac_real,
+          '\nfraction of overdebl       (excluding non-detected/failed)', over_frac_real)
+
+    print()
+    print('non detected', non_det.sum())
+    print('failed      ', failed.sum())
+    print('failed list',debl_analysis_table['image_ID'][failed] - 1)
+
+    ID_list_KO_over_ast = debl_analysis_table['image_ID'][over] - 1
+    print('len over list', len(ID_list_KO_over_ast))
+    print('over list', ID_list_KO_over_ast)
+
+    ID_list_KO_under_ast = debl_analysis_table['image_ID'][under] - 1
+    if n_sim == 1:
+        print('len non_det list', len(ID_list_KO_under_ast))
+        print('non_det/failed', ID_list_KO_under_ast)
+    else:
+        print('len under list', len(ID_list_KO_under_ast))
+        print('under list', ID_list_KO_under_ast)
+    print('------------------------------------------------')
+    print()
+    debl_stats = np.zeros(1, dtype=[('frac_debl_ok', 'f4'),
+                                    ('frac_debl_ok_th', 'f4'),
+                                    ('frac_underdebl', 'f4'),
+                                    ('frac_overdebl', 'f4'),
+                                    ('frac_ok_th_real', 'f4'),
+                                    ('frac_underdebl_real', 'f4'),
+                                    ('frac_overdebl_real', 'f4')])
+
+    debl_stats[0] = (det_ok_frac, frac_ok_th, under_frac, over_frac,frac_ok_th_real,under_frac_real,over_frac_real)
+    return debl_stats
 
 def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None, rec_sim_th=-1, rec_det_th=-1, overlap_th=1, contam_th=-1, verbose=False,candidate_df=None):
 
@@ -147,63 +217,12 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
     # df=pandas.read_pickle('df.pd')
     debl_analysis_table= debl_quality_analysis(true_map,candidate_df,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,contam_th=contam_th,verbose=verbose)
     
-    if debl_filter is not None:
-        debl_analysis_table=debl_analysis_table[debl_filter]
+
+
 
     try:
-        print('filtered size',debl_analysis_table.size)
-        over=debl_analysis_table['contaminant']>0
-        under=debl_analysis_table['assoc']<n_sim
-        non_det=debl_analysis_table['overlap']<1
-        failed=debl_analysis_table['failed']
-
-        net_count=debl_analysis_table['image_ID'].size-np.logical_or(non_det,failed).sum()
-        det_ok_frac=debl_analysis_table['success_n'].sum()/debl_analysis_table['image_ID'].size
-
-        frac_ok_th=debl_analysis_table['success_qual'].sum()/debl_analysis_table['image_ID'].size
-        frac_ok_th_real=debl_analysis_table['success_qual'].sum()/(net_count)
-
-        over_frac=over.sum()/debl_analysis_table['image_ID'].size
-        under_frac=under.sum()/debl_analysis_table['image_ID'].size
-
-        over_frac_real=over.sum()/(net_count)
-        under_frac_real=under.sum()/(net_count)
-        if n_sim==1:
-            under_frac=None
-            under_frac_real=None
-
-        print( 'fraction of debl OK n_det  ', det_ok_frac,
-               '\nfraction of debl OK>th     ',frac_ok_th,
-               '\nfraction of underdebl      ',under_frac,
-               '\nfraction of overdebl       ',over_frac,
-               '\nfraction of failed/non-detected   ',1.0-net_count/debl_analysis_table['image_ID'].size,
-               # '\nspurious (not in true map) ',debl_analysis_table['found'].sum()-debl_analysis_table['overlap'].sum(),
-               '\nfraction of debl OK>th     (excluding non-detected/failed)',frac_ok_th_real,
-               '\nfraction of underdebl      (excluding non-detected/failed)',under_frac_real,
-               '\nfraction of overdebl       (excluding non-detected/failed)',over_frac_real)
-
-        print()
-
-        ID_list_KO_over_ast = debl_analysis_table['image_ID'][over]-1
-        print('len over list',len(ID_list_KO_over_ast))
-        print('over list',ID_list_KO_over_ast)
-
-        ID_list_KO_under_ast = debl_analysis_table['image_ID'][under]-1
-        if n_sim == 1:
-            print('len non_det list', len(ID_list_KO_under_ast))
-            print('non_det/failed', ID_list_KO_under_ast)
-        else:
-            print('len under list', len(ID_list_KO_under_ast))
-            print('under list', ID_list_KO_under_ast)
-        print('------------------------------------------------')
-        print()
-        debl_stats = np.zeros(1, dtype=[('frac_debl_OK', 'f4'),
-                                        ('frac_debl_OK_th', 'f4'),
-                                        ('frac_underdebl', 'f4'),
-                                        ('frac_overdebl', 'f4')])
-
-        debl_stats[0]=(det_ok_frac,frac_ok_th,under_frac,over_frac)
+        debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter)
     except:
-        pass
+        debl_stats=[-1,-1,-1,-1,-1,-1,-1]
 
     return debl_analysis_table,candidate_df,debl_stats
