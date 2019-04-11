@@ -150,12 +150,13 @@ def run_asterism(set_name,
         #overlap_th=-1
         mag=25.3):
 
+    sig_pars=locals()
     #root_sex_analysis=os.path.join(root_path,root_sex_analysis)
     root_ast_detection=os.path.join(root_path,root_ast_detection)
     root_ast_analysis=os.path.join(root_path,root_ast_analysis)
 
     #dsd=DataSetDetection.from_name_factory(set_name,root_path)
-    print('run asterism pipeline')
+    print('run asterism pipeline',locals())
     # asterism
     #if only_sex is False:
     ast_flag = dsd.get_run_flag(h_min, h_max, K_denclue, validation, valid_abs_size_th, valid_sig_th,
@@ -213,9 +214,7 @@ def run_asterism(set_name,
     #detection pars
     wd = dsd.get_wd(root_ast_detection, dsd.data_flag, method, denclue_segm_method)
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
-    with open(par_file, 'r') as fp:
-        pars=json.load(fp)
-    print('detection pars',pars)
+
     if run_candidate is True:
         debl_candidate_df=run_dblending_candidate_table(dsd,
                                                         dsa,
@@ -228,12 +227,22 @@ def run_asterism(set_name,
 
     if run_analysis is True:
         debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,ast_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag=mag,max_image_id=max_image_id)
-        analsys_file_ast = os.path.join(analysis_path_ast, '%s_%s_analysis_res.pkl' % (ast_flag,analysis_flag))
+        analsys_file_ast_table = os.path.join(analysis_path_ast, '%s_%s_analysis_res.pkl' % (ast_flag,analysis_flag))
         analsys_file_ast_stat = os.path.join(analysis_path_ast, '%s_%s_analysis_stats.pkl' % (ast_flag, analysis_flag))
-        df=DataFrame(debl_analysis_table)
-        pandas.to_pickle(df,analsys_file_ast)
-        df = DataFrame(debl_stats)
-        pandas.to_pickle(df, analsys_file_ast_stat)
+
+        df_analysis_table=DataFrame(debl_analysis_table)
+        pandas.to_pickle(df_analysis_table,analsys_file_ast_table)
+
+        df_analysis_stats = DataFrame(debl_stats)
+        with open(par_file, 'r') as fp:
+            pars = json.load(fp)
+        print('detection pars', pars)
+        #df_pars=pandas.DataFrame(pars)
+        #df_analysis_stats=pandas.concat([df_pars,df_stats], axis=1, sort=False)
+        for kp in pars.keys():
+           if kp in sig_pars.keys():
+               df_analysis_stats[kp]=pars[kp]
+        pandas.to_pickle(df_analysis_stats, analsys_file_ast_stat)
 
 
 
