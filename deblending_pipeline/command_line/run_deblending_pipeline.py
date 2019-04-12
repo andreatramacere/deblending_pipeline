@@ -131,7 +131,8 @@ def run_asterism(set_name,
         run_candidate=True,
         run_analysis=True,
         max_image_id=1,
-        root_path='./',
+        root_data_path='./',
+        root_wd='./',
         conf_file='conf/detection.conf',
         root_ast_detection='deblending_detection/asterism',
         root_ast_analysis='deblending_analysis/asterism',
@@ -154,11 +155,11 @@ def run_asterism(set_name,
         mag_cut=None):
 
     sig_pars=locals()
-    # root_sex_analysis=os.path.join(root_path,root_sex_analysis)
-    root_ast_detection=os.path.join(root_path,root_ast_detection)
-    root_ast_analysis=os.path.join(root_path,root_ast_analysis)
+    # root_sex_analysis=os.path.join(root_data_path,root_sex_analysis)
+    root_ast_detection=os.path.join(root_wd,root_ast_detection)
+    root_ast_analysis=os.path.join(root_wd,root_ast_analysis)
 
-    # dsd=DataSetDetection.from_name_factory(set_name,root_path)
+    # dsd=DataSetDetection.from_name_factory(set_name,root_data_path)
     print('run asterism pipeline',locals())
     # asterism
     # if only_sex is False:
@@ -193,7 +194,7 @@ def run_asterism(set_name,
 
 
     dsa = DataSetAnalysis.from_name_factory(set_name,
-                                            root_path,
+                                            root_data_path,
                                             debl_method=method,
                                             debl_segmethod='seg_%s' % denclue_segm_method,
                                             ast_flag=ast_flag,
@@ -259,7 +260,8 @@ def run_sextractor(set_name,
         run_candidate=True,
         run_analysis=True,
         max_image_id=1,
-        root_path='./',
+        root_data_path='./',
+        root_wd='./',
         root_sex_analysis='deblending_analysis/sextractor',
         rec_sim_th=0.1,
         rec_det_th=-1,
@@ -271,17 +273,17 @@ def run_sextractor(set_name,
     print('run sextractor pipeline', 'flag',sex_flag)
     Nthr = sex_flag.split('_')[1]
     Min = sex_flag.split('_')[3]
-    root_sex_analysis=os.path.join(root_path,root_sex_analysis)
-    # root_ast_detection=os.path.join(root_path,root_ast_detection)
-    # root_ast_analysis=os.path.join(root_path,root_ast_analysis)
+    root_sex_analysis=os.path.join(root_wd,root_sex_analysis)
+    # root_ast_detection=os.path.join(root_data_path,root_ast_detection)
+    # root_ast_analysis=os.path.join(root_data_path,root_ast_analysis)
 
-    #dsd=DataSetDetection.from_name_factory(set_name,root_path)
+    #dsd=DataSetDetection.from_name_factory(set_name,root_data_path)
 
 
     #ast_flag=None
 
     dsa = DataSetAnalysis.from_name_factory(set_name,
-                                            root_path,
+                                            root_data_path,
                                             debl_method=None,
                                             debl_segmethod=None,
                                             ast_flag=None,
@@ -324,12 +326,12 @@ def run_sextractor(set_name,
 
         pandas.to_pickle(df, analsys_file_ast_sex)
 
-def set_datasets(set_name,root_path='./', method=None, denclue_segm_method=None, ast_flag=None, sex_flag=None):
+def set_datasets(set_name,root_data_path='./', method=None, denclue_segm_method=None, ast_flag=None, sex_flag=None):
 
-    dsd=DataSetDetection.from_name_factory(set_name,root_path)
+    dsd=DataSetDetection.from_name_factory(set_name,root_data_path)
 
     dsa=DataSetAnalysis.from_name_factory(set_name,
-                                         root_path,
+                                         root_data_path,
                                          debl_method=method,
                                          debl_segmethod='seg_%s'%denclue_segm_method,
                                          ast_flag=ast_flag,
@@ -358,7 +360,8 @@ def run(set_name,
         only_sex=False,
         only_asterism=False,
         max_image_id=1,
-        root_path='./',
+        root_data_path='./',
+        root_wd='./',
         conf_file='conf/detection.conf',
         root_sex_analysis='deblending_analysis/sextractor',
         root_ast_detection='deblending_detection/asterism',
@@ -387,7 +390,7 @@ def run(set_name,
 
 
 
-    dsd = DataSetDetection.from_name_factory(set_name, root_path)
+    dsd = DataSetDetection.from_name_factory(set_name, root_data_path)
 
     asterism_parm_dict={}
     if only_sex is False:
@@ -409,7 +412,7 @@ def run(set_name,
 
         if sex_flag is None:
             dsa = DataSetAnalysis.from_name_factory(set_name,
-                                                    root_path,
+                                                    root_data_path,
                                                     debl_method=None,
                                                     debl_segmethod=None,
                                                     ast_flag=None,
@@ -448,7 +451,8 @@ def main(argv=None):
     parser.add_argument('-run_candidate', action='store_true')
     parser.add_argument('-run_analysis', action='store_true')
     parser.add_argument('-max_image_id', type=int, default=-1)
-    parser.add_argument('-root_path', type=str, default='./')
+    parser.add_argument('-root_wd', type=str, default='./')
+    parser.add_argument('-root_data_path', type=str, default='./')
     parser.add_argument('-conf_file', type=str, default='conf/detection.conf')
     parser.add_argument('-h_min', type=float, default=0.05)
     parser.add_argument('-h_max', type=float, default=0.20)
