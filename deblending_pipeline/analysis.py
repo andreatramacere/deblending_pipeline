@@ -143,14 +143,14 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
     if debl_filter is not None:
         debl_analysis_table=debl_analysis_table.loc[debl_filter.values]
 
-    print('filtered size for debl filter', debl_analysis_table.size)
+    print('filtered size for debl filter', debl_analysis_table.shape)
     failed = (debl_analysis_table['failed']==True)
     print('failed      ', failed.sum())
     if failed.sum()>0:
         print('failed list', debl_analysis_table['image_ID'][failed] - 1)
     print()
     debl_analysis_table=debl_analysis_table.loc[~failed.values]
-    print('filtered size for failed', debl_analysis_table.size)
+    print('filtered size for failed', debl_analysis_table.shape)
     over = debl_analysis_table['contaminant'] > 0
     under = debl_analysis_table['assoc'] < n_sim
     # non det<1 and not failed
