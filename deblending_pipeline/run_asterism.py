@@ -290,9 +290,11 @@ def _run_detection(cube,
     par_file = os.path.join(wd, '%s_par.json' % flag)
     # print('par_file', par_file)
 
+
+    products_collection = pipeline.run()
+
     with open(par_file, 'w') as fp:
         json.dump(pars_dict, fp)
-    products_collection = pipeline.run()
 
     pipeline.dump_configuration_file(flag+'.conf')
     print('asterism stop')
