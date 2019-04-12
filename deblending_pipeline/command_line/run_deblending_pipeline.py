@@ -307,10 +307,11 @@ def run_sextractor(set_name,
                                                         sex=True)
 
         debl_candidate_df.to_pickle(debl_candidate_df_file)
-    else:
-        debl_candidate_df=pd.read_pickle(debl_candidate_df_file)
+
 
     if run_analysis is True:
+        if run_candidate is False:
+            debl_candidate_df = pd.read_pickle(debl_candidate_df_file)
 
         debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,sex_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=mag_cut,max_image_id=max_image_id,sex=True)
         analsys_file_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_res.pkl' % (sex_flag, analysis_flag))
