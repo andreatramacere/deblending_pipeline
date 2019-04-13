@@ -275,7 +275,7 @@ class DataSetAnalysis(object):
                 ast_flag=ast_flag,
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
-                    sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
+                sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
                 sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
                 sex_path_debl_1='big_r10_candels',
                 sex_flag=sex_flag,
