@@ -68,43 +68,43 @@ class DataSetDetection(object):
     @classmethod
     def build_couple_skymaker_r1(cls, root_rel_path,name='couple_skymaker_r1'):
         return cls(root_rel_path,'datasets', 'couples_19_26_24.5_d10_r1', 'cat_tot_vis', 'CANDELS',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
     @classmethod
     def build_couple_CANDELS_r1(cls, root_rel_path,name='couple_CANDELS_r1'):
         return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r1', 'real', 'n_obj_2',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
     @classmethod
     def build_single_skymaker_r1(cls, root_rel_path,name='single_skymaker_r1'):
         return cls(root_rel_path, 'datasets', 'single_19_26_24.5_d10_r1', 'cat_tot_vis', 'CANDELS',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
     @classmethod
     def build_single_CANDELS_r1(cls, root_rel_path, name='single_CANDELS_r1'):
         return cls(root_rel_path, 'datasets', 'single_19_26_24.5_d10_r1', 'real', 'n_obj_1',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10', name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10', name=name)
 
 
     @classmethod
     def build_couple_skymaker_r5(cls, root_rel_path,name='couple_skymaker_r5'):
         return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r5', 'cat_tot_vis', 'CANDELS',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
     @classmethod
     def build_couple_CANDELS_r5(cls, root_rel_path,name='couple_CANDELS_r5'):
         return cls(root_rel_path, 'datasets', 'couples_19_26_24.5_d10_r5', 'real', 'n_obj_2',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
     @classmethod
     def build_couple_big_skymaker_r10(cls, root_rel_path,name='couple_big_skymaker_r10'):
         return cls(root_rel_path, 'datasets', 'big_19_23_24.5_d50_r10', 'cat_tot_vis', 'CANDELS',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
     @classmethod
     def build_couple_big_CANDELS_r10(cls, root_rel_path,name='couple_big_CANDELS_r10'):
         return cls(root_rel_path, 'datasets', 'big_19_23_24.5_d50_r10', 'real', 'n_obj_2',
-                   'deblending_detection/sextractor/segmap_detthr_1.2_minarea_10',name=name)
+                   'sextractor_detection/segmap_detthr_1.2_minarea_10',name=name)
 
 
     @staticmethod
