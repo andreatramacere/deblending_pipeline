@@ -73,7 +73,7 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
     return assoc_dict, contaminant_dict, contaminant_list, assoc_list,failed
 
 
-def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, contam_th=-1, verbose=False):
+def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, contam_th=-1, verbose=False,mag_cut=-1):
     print('debl_quality_analysis', 'true map shape', true_map.shape)
     #out=np.zeros(true_map.shape[0],dtype=[('image_ID', '>i4'),
     #                                      ('failed','bool'),
@@ -131,14 +131,14 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
                         print('sim ID', assoc_rec_dict)
                     print('----------')
 
-            out.append([ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list)])
+            out.append([ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list),rec_det_th,rec_sim_th,contam_th,mag_cut])
             if verbose is True:
                 print('----> <-----')
         else:
-            out.append([ID_img + 1, failed, -1, -1, -1, -1, 0])
-    return DataFrame(out,columns=['image_ID','failed', 'success_n','success_qual', 'overlap','assoc','contaminant'])
+            out.append([ID_img + 1, failed, -1, -1, -1, -1, 0,rec_det_th,rec_sim_th,contam_th,mag_cut])
+    return DataFrame(out,columns=['image_ID','failed', 'success_n','success_qual', 'overlap','assoc','contaminant','rec_det_th', 'rec_sim_th', 'contam_th','mag_cut'])
 
-def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
+def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim_th=-1, contam_th=-1,mag_cut=-1):
 
     if debl_filter is not None:
         debl_analysis_table=debl_analysis_table.loc[debl_filter.values]
@@ -207,9 +207,15 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None):
                                     ('frac_overdebl', 'f4'),
                                     ('frac_ok_th_real', 'f4'),
                                     ('frac_underdebl_real', 'f4'),
-                                    ('frac_overdebl_real', 'f4')])
+                                    ('frac_overdebl_real', 'f4'),
+                                    ('n_tot', 'i4'),
+                                    ('n_net', 'i4'),
+                                    ('rec_det_th', 'f4'),
+                                    ('rec_sim_th', 'f4'),
+                                    ('contam_th', 'f4',),
+                                    ('mag_cut', 'f4',)])
 
-    debl_stats[0] = (det_ok_frac, frac_ok_th, under_frac, over_frac,frac_ok_th_real,under_frac_real,over_frac_real)
+    debl_stats[0] = (det_ok_frac, frac_ok_th, under_frac, over_frac,frac_ok_th_real,under_frac_real,over_frac_real,rec_det_th,rec_sim_th,contam_th,mag_cut)
     return debl_stats
 
 def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None, rec_sim_th=-1, rec_det_th=-1, overlap_th=1, contam_th=-1, verbose=False,candidate_df=None):
@@ -228,7 +234,7 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
 
 
 
-    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter)
+    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th)
 
     #debl_stats=[-1,-1,-1,-1,-1,-1,-1]
 

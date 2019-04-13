@@ -104,6 +104,9 @@ def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th
         debl_map=dsa.debl_map_ast[:max_image_id]
         code = 'astersim'
 
+    if mag_cut is None:
+        mag_cut = -1
+
     debl_analysis_table,df_ast,debl_stats=deblending_analysis(dsa.cube[:max_image_id],
                                   dsa.true_map[:max_image_id],
                                   debl_map,
@@ -113,11 +116,11 @@ def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th
                                   rec_sim_th=rec_sim_th,
                                   rec_det_th=rec_det_th,
                                   contam_th=contam_th,
+                                  mag_cut=mag_cut,
                                   verbose=False,
                                   candidate_df=debl_candidate_df)
 
-    if mag_cut is None:
-        mag_cut=-1
+
     flag='rec_sim_th_%2.2f_rec_det_th_%2.2f_contam_th_%2.2f_mag_cut_%2.2f'%(rec_sim_th,rec_det_th,contam_th,mag_cut)
     return debl_analysis_table,flag,debl_stats
 
