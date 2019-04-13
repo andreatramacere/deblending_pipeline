@@ -218,7 +218,7 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim
     debl_stats[0] = (det_ok_frac, frac_ok_th, under_frac, over_frac,frac_ok_th_real,under_frac_real,over_frac_real,rec_det_th,rec_sim_th,contam_th,mag_cut)
     return debl_stats
 
-def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None, rec_sim_th=-1, rec_det_th=-1, overlap_th=1, contam_th=-1, verbose=False,candidate_df=None):
+def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None, rec_sim_th=-1, rec_det_th=-1, overlap_th=1,mag_cut=-1, contam_th=-1, verbose=False,candidate_df=None):
 
     print('------------------------------------------------')
     print('name ',name)
