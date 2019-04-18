@@ -107,6 +107,7 @@ def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th
     if mag_cut is None:
         mag_cut = -1
 
+    #print('mag_cut',mag_cut)
     debl_analysis_table,df_ast,debl_stats=deblending_analysis(dsa.cube[:max_image_id],
                                   dsa.true_map[:max_image_id],
                                   debl_map,
@@ -163,7 +164,7 @@ def run_asterism(set_name,
     root_ast_analysis=os.path.join(root_wd,root_ast_analysis)
 
     # dsd=DataSetDetection.from_name_factory(set_name,root_data_path)
-    print('run asterism pipeline',locals())
+    #print('run asterism pipeline',locals())
     # asterism
     # if only_sex is False:
     ast_flag = dsd.get_run_flag(h_min, h_max, K_denclue, validation, valid_abs_size_th, valid_sig_th,
@@ -246,12 +247,18 @@ def run_asterism(set_name,
         df_analysis_stats = DataFrame(debl_stats)
         with open(par_file, 'r') as fp:
             pars = json.load(fp)
-        print('detection pars', pars)
+        #print('detection pars', pars.keys())
+        #print('signature  pars',  sig_pars.keys())
         # df_pars=pandas.DataFrame(pars)
         # df_analysis_stats=pandas.concat([df_pars,df_stats], axis=1, sort=False)
         for kp in pars.keys():
-           if kp in sig_pars.keys():
-               df_analysis_stats[kp]=pars[kp]
+            #print(kp)
+            #if kp in sig_pars.keys():
+            #print('->kp',kp)
+            df_analysis_stats[kp]=pars[kp]
+        #print('mag_cut',mag_cut)
+        #print('out file',analsys_file_ast_stat)
+        #print(df_analysis_stats.keys())
         pandas.to_pickle(df_analysis_stats  , analsys_file_ast_stat)
 
 

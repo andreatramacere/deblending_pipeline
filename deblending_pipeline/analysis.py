@@ -239,15 +239,15 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
 
     if candidate_df is None:
         candidate_df=build_candidate_df(cube,true_map,debl_map,overlap_th=-1,verbose=verbose)
-
+    print('mag_cut',mag_cut)
     # df=pandas.read_pickle('df.pd')
-    debl_analysis_table= debl_quality_analysis(true_map,candidate_df,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,contam_th=contam_th,verbose=verbose)
+    debl_analysis_table= debl_quality_analysis(true_map,candidate_df,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,contam_th=contam_th,verbose=verbose,mag_cut=mag_cut)
     
 
 
 
 
-    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th)
+    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,mag_cut=mag_cut)
 
     #debl_stats=[-1,-1,-1,-1,-1,-1,-1]
 
