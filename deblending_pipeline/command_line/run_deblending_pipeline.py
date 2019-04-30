@@ -225,11 +225,17 @@ def run_asterism(set_name,
     wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name,method, denclue_segm_method)
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
 
+    with open(par_file, 'r') as fp:
+        pars = json.load(fp)
+
     if run_candidate is True:
         debl_candidate_df=run_dblending_candidate_table(dsd,
                                                         dsa,
                                                         max_image_id=max_image_id)
 
+
+        for kp in pars.keys():
+            debl_candidate_df[kp]=pars[kp]
         debl_candidate_df.to_pickle(debl_candidate_df_file)
 
     if run_analysis is True:
@@ -242,11 +248,10 @@ def run_asterism(set_name,
         analsys_file_ast_stat = os.path.join(analysis_path_ast, '%s_%s_analysis_stats.pkl' % (ast_flag, analysis_flag))
 
         df_analysis_table=DataFrame(debl_analysis_table)
-        pandas.to_pickle(df_analysis_table,analsys_file_ast_table)
+
 
         df_analysis_stats = DataFrame(debl_stats)
-        with open(par_file, 'r') as fp:
-            pars = json.load(fp)
+
         #print('detection pars', pars.keys())
         #print('signature  pars',  sig_pars.keys())
         # df_pars=pandas.DataFrame(pars)
@@ -256,11 +261,12 @@ def run_asterism(set_name,
             #if kp in sig_pars.keys():
             #print('->kp',kp)
             df_analysis_stats[kp]=pars[kp]
+            df_analysis_table[kp]=pars[kp]
         #print('mag_cut',mag_cut)
         #print('out file',analsys_file_ast_stat)
         #print(df_analysis_stats.keys())
         pandas.to_pickle(df_analysis_stats  , analsys_file_ast_stat)
-
+        pandas.to_pickle(df_analysis_table, analsys_file_ast_table)
 
 
 
