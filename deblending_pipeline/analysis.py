@@ -131,11 +131,11 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
                         print('sim ID', assoc_rec_dict)
                     print('----------')
 
-            out.append([ID_img+1,failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list),rec_det_th,rec_sim_th,contam_th,mag_cut])
+            out.append([ID_img, failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list),rec_det_th,rec_sim_th,contam_th,mag_cut])
             if verbose is True:
                 print('----> <-----')
         else:
-            out.append([ID_img + 1, failed, -1, -1, -1, -1, 0,rec_det_th,rec_sim_th,contam_th,mag_cut])
+            out.append([ID_img, failed, -1, -1, -1, -1, 0,rec_det_th,rec_sim_th,contam_th,mag_cut])
     return DataFrame(out,columns=['image_ID','failed', 'success_n','success_qual', 'overlap','assoc','contaminant','rec_det_th', 'rec_sim_th', 'contam_th','mag_cut'])
 
 def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim_th=-1, contam_th=-1,mag_cut=-1):
@@ -147,7 +147,7 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim
     failed = (debl_analysis_table['failed']==True)
     print('failed      ', failed.sum())
     if failed.sum()>0:
-        print('failed list', debl_analysis_table['image_ID'][failed] - 1)
+        print('failed list', debl_analysis_table['image_ID'][failed])
     print()
     debl_analysis_table=debl_analysis_table.loc[~failed.values]
     print('filtered size for failed', debl_analysis_table.shape)
@@ -188,11 +188,11 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim
     print()
     print('non detected', non_det.sum())
 
-    ID_list_KO_over_ast = list(debl_analysis_table['image_ID'][over].values - 1)
+    ID_list_KO_over_ast = list(debl_analysis_table['image_ID'][over].values )
     print('len over list', len(ID_list_KO_over_ast))
     print('over list', ID_list_KO_over_ast)
 
-    ID_list_KO_under_ast = list(debl_analysis_table['image_ID'][under].values - 1)
+    ID_list_KO_under_ast = list(debl_analysis_table['image_ID'][under].values )
     if n_sim == 1:
         print('len non_det list', len(ID_list_KO_under_ast))
         print('non_det/failed', ID_list_KO_under_ast)

@@ -288,7 +288,7 @@ def select_catalog_par(debl_rep,catalog,p,msk_sel,true_map,seg_map):
     x=[]
     p_sel=[]
     
-    for ID,img_ID in enumerate(debl_rep['image_ID'][msk_sel]-1):
+    for ID,img_ID in enumerate(debl_rep['image_ID'][msk_sel]):
         id_parent=np.unique(seg_map[img_ID][np.logical_and(true_map[img_ID],seg_map[img_ID])])
         id_parent=id_parent[id_parent>0]
         msk=np.logical_and(np.isin(catalog['src_ID'],id_parent),catalog['image_ID']==img_ID)
@@ -300,7 +300,7 @@ def select_catalog_par(debl_rep,catalog,p,msk_sel,true_map,seg_map):
             x.extend(p[msk])
            
             
-    for ID,img_ID in enumerate(debl_rep['image_ID']-1):
+    for ID,img_ID in enumerate(debl_rep['image_ID']):
         id_parent=np.unique(seg_map[img_ID][np.logical_and(true_map[img_ID],seg_map[img_ID])])
         id_parent=id_parent[id_parent>0]
         msk=np.logical_and(np.isin(catalog['src_ID'],id_parent),catalog['image_ID']==img_ID)
@@ -324,7 +324,7 @@ def anlysis(debl_rep,segment_catalog,deblended_catalog,n_sim,true_map,seg_map):
     
     h=np.zeros(p.size)
     for ID,im_id in enumerate(segment_catalog['image_ID']):
-        _h=deblended_catalog['h'][deblended_catalog['image_ID']==im_id-1]
+        _h=deblended_catalog['h'][deblended_catalog['image_ID']==im_id]
         if len(_h)==0:
             h[ID]=None
         else:

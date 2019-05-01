@@ -225,8 +225,20 @@ def run_asterism(set_name,
     wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name,method, denclue_segm_method)
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
 
+    keep_list=['conf_file','name','max_image_id', 'method',
+     'denclue_segm_method', 'h_frac_min', 'h_frac_max', 'valid_abs_size_th',
+     'valid_sig_th', 'overlap_max', 'K_denclue', 'downsampling',
+     'validate_children', 'morph_corr', 'log_file']
+
     with open(par_file, 'r') as fp:
         pars = json.load(fp)
+
+    for k in list(pars.keys()):
+        #print ('->',k)
+        if k not in keep_list:
+            pars.pop(k)
+
+
 
     if run_candidate is True:
         debl_candidate_df=run_dblending_candidate_table(dsd,
@@ -244,18 +256,20 @@ def run_asterism(set_name,
 
 
         debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,ast_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=mag_cut,max_image_id=max_image_id)
-        analsys_file_ast_table = os.path.join(analysis_path_ast, '%s_%s_analysis_res.pkl' % (ast_flag,analysis_flag))
+
+        analsys_file_ast_res = os.path.join(analysis_path_ast, '%s_%s_analysis_res.pkl' % (ast_flag,analysis_flag))
         analsys_file_ast_stat = os.path.join(analysis_path_ast, '%s_%s_analysis_stats.pkl' % (ast_flag, analysis_flag))
+        analsys_file_ast_stat_txt = os.path.join(analysis_path_ast, '%s_%s_analysis_stats.txt' % (ast_flag, analysis_flag))
 
-        df_analysis_table=DataFrame(debl_analysis_table)
-
-
+        df_analysis_table = DataFrame(debl_analysis_table)
         df_analysis_stats = DataFrame(debl_stats)
 
         #print('detection pars', pars.keys())
         #print('signature  pars',  sig_pars.keys())
         # df_pars=pandas.DataFrame(pars)
         # df_analysis_stats=pandas.concat([df_pars,df_stats], axis=1, sort=False)
+        #print(sig_pars.keys())
+        #print('---')
         for kp in pars.keys():
             #print(kp)
             #if kp in sig_pars.keys():
@@ -265,9 +279,10 @@ def run_asterism(set_name,
         #print('mag_cut',mag_cut)
         #print('out file',analsys_file_ast_stat)
         #print(df_analysis_stats.keys())
-        pandas.to_pickle(df_analysis_stats  , analsys_file_ast_stat)
-        pandas.to_pickle(df_analysis_table, analsys_file_ast_table)
-
+        pandas.to_pickle(df_analysis_stats, analsys_file_ast_stat)
+        pandas.to_pickle(df_analysis_table, analsys_file_ast_res)
+        with open(analsys_file_ast_stat_txt, 'w') as f:
+            df_analysis_stats.to_string(f,index=False)
 
 
 
@@ -334,15 +349,21 @@ def run_sextractor(set_name,
             debl_candidate_df = pd.read_pickle(debl_candidate_df_file)
 
         debl_analysis_table, analysis_flag,debl_stats=run_dblending_analysis(dsa,sex_flag,debl_candidate_df,rec_sim_th,rec_det_th,contam_th,mag_cut=mag_cut,max_image_id=max_image_id,sex=True)
-        analsys_file_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_res.pkl' % (sex_flag, analysis_flag))
-        analsys_file_ast_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_stats.pkl' % (sex_flag, analysis_flag))
+        analsys_file_res_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_res.pkl' % (sex_flag, analysis_flag))
+        analsys_file_stat_sex = os.path.join(analysis_path_sex, '%s_%s_analysis_stats.pkl' % (sex_flag, analysis_flag))
+        analsys_file_stat_sex_txt = os.path.join(analysis_path_sex,'%s_%s_analysis_stats.txt' % (sex_flag, analysis_flag))
+
         df = DataFrame(debl_analysis_table)
-        pandas.to_pickle(df, analsys_file_sex)
+        pandas.to_pickle(df, analsys_file_res_sex)
+
         df = DataFrame(debl_stats)
         df['Nthr']=Nthr
         df['Min']=Min
 
-        pandas.to_pickle(df, analsys_file_ast_sex)
+        pandas.to_pickle(df, analsys_file_stat_sex)
+        with open(analsys_file_stat_sex_txt, 'w') as f:
+            df.to_string(f)
+
 
 def set_datasets(set_name,root_data_path='./', method=None, denclue_segm_method=None, ast_flag=None, sex_flag=None):
 
