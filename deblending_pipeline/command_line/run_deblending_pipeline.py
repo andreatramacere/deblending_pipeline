@@ -47,6 +47,7 @@ def run_deblending_detection(dsd,
                              h_min,
                              h_max,
                              K_denclue,
+                             watershed_compactness,
                              validation,
                              method,
                              denclue_segm_method,
@@ -65,6 +66,7 @@ def run_deblending_detection(dsd,
                   h_min,
                   h_max,
                   K_denclue,
+                  watershed_compactness,
                   method,
                   validation,
                   downsampling=downsampling,
@@ -143,6 +145,7 @@ def run_asterism(set_name,
         h_min=0.05,
         h_max=0.20,
         K_denclue=8,
+        watershed_compactness=0.,
         validation=True,
         downsampling=True,
         valid_abs_size_th=8,
@@ -167,7 +170,7 @@ def run_asterism(set_name,
     #print('run asterism pipeline',locals())
     # asterism
     # if only_sex is False:
-    ast_flag = dsd.get_run_flag(h_min, h_max, K_denclue, validation, valid_abs_size_th, valid_sig_th,
+    ast_flag = dsd.get_run_flag(h_min, h_max, K_denclue,watershed_compactness, validation, valid_abs_size_th, valid_sig_th,
                                 valid_overlap_max,
                                 downsampling)
     if run_detection is True:
@@ -184,6 +187,7 @@ def run_asterism(set_name,
                                  h_min,
                                  h_max,
                                  K_denclue,
+                                 watershed_compactness,
                                  validation,
                                  method,
                                  denclue_segm_method,
@@ -409,6 +413,7 @@ def run(set_name,
         h_min=0.05,
         h_max=0.20,
         K_denclue=8,
+        watershed_compactness=0.,
         validation=True,
         downsampling=True,
         valid_abs_size_th=8,
@@ -498,6 +503,7 @@ def main(argv=None):
     parser.add_argument('-h_min', type=float, default=0.05)
     parser.add_argument('-h_max', type=float, default=0.20)
     parser.add_argument('-K_denclue', type=int, default=8)
+    parser.add_argument('-watershed_compactness', type=float, default=0.0)
     parser.add_argument('-validation', action='store_true')
     parser.add_argument('-downsampling', action='store_true')
     parser.add_argument('-valid_abs_size_th', type=int, default=8)

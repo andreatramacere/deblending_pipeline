@@ -111,13 +111,14 @@ class DataSetDetection(object):
     def get_run_flag(h_frac_min,
                      h_frac_max,
                      K_denclue,
+                     watershed_compactness,
                      validate_children,
                      valid_abs_size_th,
                      valid_sig_th,
                      valid_overlap_max,
                      downsampling):
 
-        flag = 'h_min_%2.2f_h_max_%2.2f_K_denc_%2.2d_donws_%d_valid_%d' % (h_frac_min, h_frac_max,K_denclue,downsampling,validate_children)
+        flag = 'h_min_%2.2f_h_max_%2.2f_K_denc_%2.2d_comp_%2.2f_donws_%d_valid_%d' % (h_frac_min, h_frac_max,K_denclue,watershed_compactness,downsampling,validate_children)
         if validate_children is True:
             flag = flag+'_size_th_%3.3d_sig_th_%2.2f_overlap_th_%2.2f'%(valid_abs_size_th, valid_sig_th,
                                                                         valid_overlap_max)
@@ -139,6 +140,7 @@ class DataSetDetection(object):
                       h_frac_min,
                       h_frac_max,
                       K_denclue,
+                      watershed_compactness,
                       method,
                       validate_children,
                       denclue_segm_method='',
@@ -153,6 +155,7 @@ class DataSetDetection(object):
         _run_detection(cube=self.cube_file,
                        name=name,
                        K_denclue=K_denclue,
+                       watershed_compactness=watershed_compactness,
                        conf_file=conf_file,
                        rms_file=self.rms_file,
                        segm_file=self.segmap_file,
@@ -198,6 +201,7 @@ def _run_detection(cube,
                    valid_sig_th=1.5,
                    overlap_max=0.85,
                    K_denclue=4,
+                   watershed_compactness=0.,
                    downsampling=True,
                    validate_children=True,
                    morph_corr=False,
@@ -266,6 +270,7 @@ def _run_detection(cube,
 
     pipeline.do_src_detection.denclue_deblending.set_par('morphological_correction', value=morph_corr)
     pipeline.do_src_detection.denclue_deblending.set_par('attr_dbs_K',value=K_denclue)
+    pipeline.do_src_detection.denclue_deblending.set_par('watershed_compactness', value=watershed_compactness)
     pipeline.do_src_detection.denclue_deblending.set_par('do_downsampling', value=downsampling)
     pipeline.do_src_detection.image_segmentation.set_par('method', value=im_seg_method)
 
@@ -277,6 +282,7 @@ def _run_detection(cube,
     flag = DataSetDetection.get_run_flag(h_frac_min,
                                          h_frac_max,
                                          K_denclue,
+                                         watershed_compactness,
                                          validate_children,
                                          valid_abs_size_th,
                                          valid_sig_th,
