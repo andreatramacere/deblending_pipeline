@@ -231,7 +231,7 @@ def run_asterism(set_name,
 
     keep_list=['conf_file','name','max_image_id', 'method',
      'denclue_segm_method', 'h_frac_min', 'h_frac_max', 'valid_abs_size_th',
-     'valid_sig_th', 'overlap_max', 'K_denclue', 'downsampling',
+     'valid_sig_th', 'overlap_max', 'K_denclue', 'watershed_compactness','downsampling',
      'validate_children', 'morph_corr', 'log_file']
 
     with open(par_file, 'r') as fp:
