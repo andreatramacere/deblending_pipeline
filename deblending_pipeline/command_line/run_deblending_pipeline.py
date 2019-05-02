@@ -346,7 +346,7 @@ def run_sextractor(set_name,
                                                         sex=True)
 
         debl_candidate_df['Nthr'] = Nthr
-        debl_candidate_df['Min'] = Min
+        debl_candidate_df['MinCnt'] = Min
         debl_candidate_df.to_pickle(debl_candidate_df_file)
 
 
@@ -365,13 +365,13 @@ def run_sextractor(set_name,
 
         df = DataFrame(debl_stats)
         df['Nthr']=Nthr
-        df['Min']=Min
+        df['MinCnt']=Min
 
         pandas.to_pickle(df, analsys_file_stat_sex)
 
         df = DataFrame(debl_analysis_table)
         df['Nthr'] = Nthr
-        df['Min'] = Min
+        df['MinCnt'] = Min
         pandas.to_pickle(df, analsys_file_res_sex)
 
         with open(analsys_file_stat_sex_txt, 'w') as f:
