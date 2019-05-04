@@ -247,7 +247,7 @@ def deblending_analysis(cube, true_map, debl_map, name, n_sim, debl_filter=None,
 
 
 
-    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,mag_cut=mag_cut)
+    debl_stats = eval_stats(debl_analysis_table, n_sim, debl_filter=debl_filter,rec_sim_th=rec_sim_th,rec_det_th=rec_det_th,mag_cut=mag_cut,contam_th=contam_th)
 
     #debl_stats=[-1,-1,-1,-1,-1,-1,-1]
 
