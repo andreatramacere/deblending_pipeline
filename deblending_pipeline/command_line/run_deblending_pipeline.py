@@ -507,7 +507,7 @@ def main(argv=None):
     parser.add_argument('-run_detection', action='store_true')
     parser.add_argument('-run_candidate', action='store_true')
     parser.add_argument('-run_analysis', action='store_true')
-    parser.add_argument('-max_image_id', type=int, default=-1)
+    parser.add_argument('-max_image_id', type=int, default=None)
     parser.add_argument('-root_wd', type=str, default='./')
     parser.add_argument('-root_data_path', type=str, default='./')
     parser.add_argument('-conf_file', type=str, default='conf/detection.conf')

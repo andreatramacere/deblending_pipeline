@@ -46,7 +46,7 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
 
     else:
         failed=True
-    print(image_ID,assoc_list,contaminant_list)
+    #print(image_ID,assoc_list,contaminant_list)
     if verbose is True:
         print('assoc_dict', assoc_dict)
         print('contaminant_dict', contaminant_dict)
@@ -194,8 +194,8 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim
     det_ok_frac = debl_analysis_table['success_n'].sum() / debl_analysis_table['image_ID'].size
     n_ok= debl_analysis_table['success_n'].sum()
 
+    n_ok_th = debl_analysis_table['success_qual'].sum()
     frac_ok_th = debl_analysis_table['success_qual'].sum() / debl_analysis_table['image_ID'].size
-    n_ok_th= debl_analysis_table['success_qual'].sum()
     frac_ok_th_real = debl_analysis_table['success_qual'].sum() / (net_count)
 
     over_frac = over.sum() / debl_analysis_table['image_ID'].size
