@@ -89,23 +89,19 @@ class DataSetAnalysis(object):
 
 
         self.sex_deblm_map_path=os.path.join(root_rel_path, sex_path_debl,data_flag,sex_path_debl_1)
+        _sex_seg_map_path = os.path.join(self.data_path, '*%s*_cube*%s*' % (sample_flag, sample_flag_1))
         if sex_flag is not None:
-            #_path_sex_segmap = os.path.join(root_rel_path, sex_path_seg, '%s*%s*_segmap*' % (data_flag, sample_flag))
-            # print('path segmap', _path)
 
-            #segmap_file = glob.glob(_path)[0]
-            #print('-> sex segmap', segmap_file)
-            #self.seg_map_sex = pf.getdata(segmap_file)
-
-            _path = os.path.join( self.sex_deblm_map_path,'*%s*segmentation_map_debl*'%sex_flag)
-            #print('_path',_path)
+            _path_sex_debl_map = os.path.join( self.sex_deblm_map_path,'*%s*segmentation_map_debl*'%sex_flag)
             try:
-                segmap_debl_file = glob.glob(_path)[0]
+                segmap_debl_file = glob.glob(_path_sex_debl_map)[0]
+                seg_map_file= glob.glob(_sex_seg_map_path)[0]
             except:
                 raise RuntimeError('sex path problem', _path)
             print('-> sex debl_map', segmap_debl_file)
+            print('-> sex seg map', seg_map_file)
             self.debl_map_sex = pf.getdata(segmap_debl_file)
-
+            self.seg_map_sex = pf.getdata(seg_map_file)
     @classmethod
     def from_name_factory(cls,name,root_rel_path,ast_root_path, debl_method, debl_segmethod, ast_flag, sex_flag,ast_name,mag_cut=None):
         _dict={}

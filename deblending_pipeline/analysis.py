@@ -7,70 +7,101 @@ __author__ = "Andrea Tramacere"
 
 
 def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=False):
-    #print('---> image_ID',image_ID)
-    #print(ID_sim_list[0],
-    #      np.sum(candidate_df['sim_ID']==ID_sim_list[0]),
-    #      np.sum(candidate_df['image_ID']==image_ID),
-    #      np.sum(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID)),
-    #      np.argwhere(np.logical_and(candidate_df['sim_ID'] == ID_sim_list[0], candidate_df['image_ID'] == image_ID))
-    #      )
-
     assoc_dict = {}
     contaminant_dict = {}
     assoc_list = []
     contaminant_list = []
-    sel_row=candidate_df.loc[candidate_df['image_ID']==image_ID]
-    failed=np.sum(sel_row['failed'])>0
-    if len(ID_sim_list)>0 and ~ failed:
-        sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
-        sim_row = candidate_df.loc[sel_row]
 
-        contaminant_list=sim_row['ID_det_list'].tolist()
-        # if verbose==True:
-        #    print('gett assoc cont for image ->',image_ID,'sim_list',ID_sim_list,contaminant_list)
-        # print(type(sim_row))
+    sel_row = candidate_df.loc[candidate_df['image_ID'] == image_ID]
+    failed = np.sum(sel_row['failed']) > 0
+    if len(ID_sim_list) > 0 and ~ failed:
+        #get associated
         for sim_ID in ID_sim_list:
-            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID'] ==sim_ID, candidate_df['image_ID'] == image_ID))[0][0]
             sim_row = candidate_df.loc[sel_row]
-            # sim_row= df.loc[df['sim_ID']==sim_ID]
-            # if verbose==True:
-            #   print('sim_row ->',sim_row['rec_dict_list'])
-            #    for rec_dict in sim_row['rec_dict_list']:
-            #        print('rec_dict',rec_dict['dist'])
 
-            # print('ID sim',sim_ID)
-            dist=[rec_dict['dist'] for rec_dict in sim_row['rec_dict_list'] ]
+            dist = [rec_dict['dist'] for rec_dict in sim_row['rec_dict_list']]
+            if len(dist) > 0:
+                _selected = np.argmin(dist)
 
-            # dist, cl_ID_list=get_cluster_distance_to_clusters_list(sim_cl,det_cl_list)
-            #
-            if len(dist)>0:
-                _selected=np.argmin(dist)
-                # print('dist',dist,_selected,sim_row['rec_dict_list'][_selected]['det_ID'])
-                assoc_dict[sim_ID]=sim_row['rec_dict_list'][_selected]
-                # contaminant_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
-                if sim_row['rec_dict_list'][_selected]['det_ID'] in contaminant_list:
-                    contaminant_list.remove(sim_row['rec_dict_list'][_selected]['det_ID'])
-                    assoc_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
+                assoc_ID = sim_row['rec_dict_list'][_selected]['det_ID']
 
+                if assoc_ID not in assoc_list:
+                    assoc_list.append(assoc_ID)
+                    assoc_dict[sim_ID] = sim_row['rec_dict_list'][_selected]
 
+        # get contaminant
         for sim_ID in ID_sim_list:
-            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID'] == ID_sim_list[0], candidate_df['image_ID'] == image_ID))[0][0]
             sim_row = candidate_df.loc[sel_row]
+            for ID_det in sim_row['ID_det_list']:
+                if ID_det not in assoc_list and ID_det not in contaminant_list:
+                    contaminant_list.append(ID_det)
             _l = []
-            # print(sim_row.keys())
             for rec_dict in sim_row['rec_dict_list']:
                 if rec_dict['det_ID'] in contaminant_list:
                         _l.append(rec_dict)
             contaminant_dict[sim_ID] =_l
+
+
     else:
         failed=True
-
-    #print('failed->', failed)
+    print(image_ID,assoc_list,contaminant_list)
     if verbose is True:
         print('assoc_dict', assoc_dict)
         print('contaminant_dict', contaminant_dict)
         print('contaminant_list', contaminant_list)
     return assoc_dict, contaminant_dict, contaminant_list, assoc_list,failed
+
+
+
+# def get_associated_and_contaminant_wrong(candidate_df, image_ID, ID_sim_list, verbose=False):
+#
+#     assoc_dict = {}
+#     contaminant_dict = {}
+#     assoc_list = []
+#     contaminant_list = []
+#     sel_row=candidate_df.loc[candidate_df['image_ID']==image_ID]
+#     failed=np.sum(sel_row['failed'])>0
+#     if len(ID_sim_list)>0 and ~ failed:
+#         sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==ID_sim_list[0] ,candidate_df['image_ID']==image_ID))[0][0]
+#         sim_row = candidate_df.loc[sel_row]
+#
+#         contaminant_list=sim_row['ID_det_list'].tolist()
+#
+#         for sim_ID in ID_sim_list:
+#             sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+#             sim_row = candidate_df.loc[sel_row]
+#
+#             dist=[rec_dict['dist'] for rec_dict in sim_row['rec_dict_list'] ]
+#
+#             if len(dist)>0:
+#                 _selected=np.argmin(dist)
+#                 # print('dist',dist,_selected,sim_row['rec_dict_list'][_selected]['det_ID'])
+#                 assoc_dict[sim_ID]=sim_row['rec_dict_list'][_selected]
+#                 # contaminant_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
+#                 if sim_row['rec_dict_list'][_selected]['det_ID'] in contaminant_list:
+#                     contaminant_list.remove(sim_row['rec_dict_list'][_selected]['det_ID'])
+#                     assoc_list.append(sim_row['rec_dict_list'][_selected]['det_ID'])
+#
+#
+#         for sim_ID in ID_sim_list:
+#             sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID']==sim_ID ,candidate_df['image_ID']==image_ID))[0][0]
+#             sim_row = candidate_df.loc[sel_row]
+#             _l = []
+#             for rec_dict in sim_row['rec_dict_list']:
+#                 if rec_dict['det_ID'] in contaminant_list:
+#                         _l.append(rec_dict)
+#             contaminant_dict[sim_ID] =_l
+#     else:
+#         failed=True
+#
+#     #print('failed->', failed)
+#     if verbose is True:
+#         print('assoc_dict', assoc_dict)
+#         print('contaminant_dict', contaminant_dict)
+#         print('contaminant_list', contaminant_list)
+#     return assoc_dict, contaminant_dict, contaminant_list, assoc_list,failed
 
 
 def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, contam_th=-1, verbose=False,mag_cut=-1):
@@ -161,8 +192,10 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim
 
     net_count = debl_analysis_table['image_ID'].size - non_det.sum()
     det_ok_frac = debl_analysis_table['success_n'].sum() / debl_analysis_table['image_ID'].size
+    n_ok= debl_analysis_table['success_n'].sum()
 
     frac_ok_th = debl_analysis_table['success_qual'].sum() / debl_analysis_table['image_ID'].size
+    n_ok_th= debl_analysis_table['success_qual'].sum()
     frac_ok_th_real = debl_analysis_table['success_qual'].sum() / (net_count)
 
     over_frac = over.sum() / debl_analysis_table['image_ID'].size
@@ -175,7 +208,11 @@ def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim
         under_frac_real = None
 
     print('stats below are net of failed')
-    print('fraction of debl OK n_det  ', det_ok_frac,
+    print('debl OK n_det', n_ok,
+          '\ndebl OK>th',n_ok_th,
+          '\noverdebl',over.sum(),
+          '\nunderdebl ',under.sum(),
+          '\nfraction of debl OK n_det  ', det_ok_frac,
           '\nfraction of debl OK>th     ', frac_ok_th,
           '\nfraction of underdebl      ', under_frac,
           '\nfraction of overdebl       ', over_frac,

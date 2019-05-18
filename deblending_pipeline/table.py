@@ -43,7 +43,7 @@ def get_cluster_distance_to_clusters_list(cluster,clusters_list):
 
 
 def detect_cluster_with_overlap(image,input_seg_map_overlap,ID_target,image_ID):
-    """This function detects a cluster with ID==ID_target strating from a segmap with overlappin ID (-1)
+    """This function detects a cluster with ID==ID_target starting from a segmap with overlappin ID (-1)
     Pixels with  ID==-1 and continguos to pixels with ID==ID_target are merged together 
     and the corresponding cluster is detected
     
@@ -232,7 +232,7 @@ def build_candidate_list(image,true_map,deblended_map,ID_sim,ID_det_overlap_list
 
 
 
-def build_candidate_df(cube,true_map,deblended_map,overlap_th=-1,verbose=False):
+def build_candidate_df(cube,true_map,deblended_map,seg_map,overlap_th=-1,verbose=False):
     """
     
     """
@@ -243,20 +243,24 @@ def build_candidate_df(cube,true_map,deblended_map,overlap_th=-1,verbose=False):
     Table=[]
     for ID_img,tm in enumerate(true_map):
         
-        #msk of simulated
-        #you mus keep -1 for overlap so the condition is !=0
-        msk_sim=true_map[ID_img]!=0
-        
-        #msk of detected
-        msk_det=np.logical_and(msk_sim,deblended_map[ID_img]>0)
-        
-        
+        # msk of simulated
+        # you mus keep -1 for overlap so the condition is !=0
+        msk_sim = true_map[ID_img]!=0
+
+        # msk of detected
+        ID_det_list = np.unique(seg_map[ID_img][np.logical_and(msk_sim,seg_map[ID_img]>0)])
+
+        msk_det=np.zeros(seg_map[ID_img].shape,dtype=np.bool)
+        for ID in ID_det_list:
+            msk_det=np.logical_or(msk_det,np.logical_and(deblended_map[ID_img],seg_map[ID_img]==ID))
+        # msk_det=np.logical_and(msk_sim,deblended_map[ID_img]>0)
+
         #sim list
         #in this case you don't want to keep -1 in the id list
         ID_sim_list=np.unique(true_map[ID_img][true_map[ID_img]>0]).astype(np.int)
         
         #detected in the full stamp
-        n_found=len(np.unique(deblended_map[ID_img][deblended_map[ID_img]>0]).astype(np.int))
+        #n_found=len(np.unique(deblended_map[ID_img][deblended_map[ID_img]>0]).astype(np.int))
         
         #detected list overlapping the true map
         #these will be splitted in associated and contaminant
@@ -275,7 +279,9 @@ def build_candidate_df(cube,true_map,deblended_map,overlap_th=-1,verbose=False):
                 failed=True
                 tab_row=[ID_img,failed,ID_sim,[],[]]
             Table.append(tab_row)
-        
+
+        #print('Image ID',ID_img,'det_list',ID_det_list,'candid_list',canditate_list)
+
         df=DataFrame(Table,columns=['image_ID','failed', 'sim_ID','ID_det_list', 'rec_dict_list'])
     return df
 

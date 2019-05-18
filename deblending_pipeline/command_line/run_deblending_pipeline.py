@@ -83,10 +83,12 @@ def run_deblending_detection(dsd,
 def run_dblending_candidate_table(dsd,dsa,max_image_id=None,sex=False):
     if sex==True:
         debl_map=dsa.debl_map_sex[:max_image_id]
+        seg_map = dsa.seg_map_sex[:max_image_id]
     else:
         debl_map=dsa.debl_map_ast[:max_image_id]
+        seg_map=dsa.seg_map_ast[:max_image_id]
 
-    debl_candidate_df=build_candidate_df(dsa.cube[:max_image_id],dsa.true_map[:max_image_id],debl_map)   
+    debl_candidate_df=build_candidate_df(dsa.cube[:max_image_id],dsa.true_map[:max_image_id],debl_map,seg_map)
     return debl_candidate_df
 
 
