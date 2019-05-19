@@ -370,14 +370,16 @@ def run_sextractor(set_name,
         df['MinCnt']=Min
 
         pandas.to_pickle(df, analsys_file_stat_sex)
+        with open(analsys_file_stat_sex_txt, 'w') as f:
+            df.to_string(f)
+
 
         df = DataFrame(debl_analysis_table)
         df['Nthr'] = Nthr
         df['MinCnt'] = Min
         pandas.to_pickle(df, analsys_file_res_sex)
 
-        with open(analsys_file_stat_sex_txt, 'w') as f:
-            df.to_string(f)
+
 
 
 def set_datasets(set_name,root_data_path='./', method=None, denclue_segm_method=None, ast_flag=None, sex_flag=None):
