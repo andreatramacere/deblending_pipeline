@@ -89,7 +89,7 @@ class DataSetAnalysis(object):
 
 
         self.sex_deblm_map_path=os.path.join(root_rel_path, sex_path_debl,data_flag,sex_path_debl_1)
-        _sex_seg_map_path = os.path.join(self.data_path, '*%s*_cube*%s*' % (sample_flag, sample_flag_1))
+        _sex_seg_map_path =os.path.join(root_rel_path,sex_path_seg,'%s*%s*_segmap*' % (data_flag,sample_flag))
         if sex_flag is not None:
 
             _path_sex_debl_map = os.path.join( self.sex_deblm_map_path,'*%s*segmentation_map_debl*'%sex_flag)
