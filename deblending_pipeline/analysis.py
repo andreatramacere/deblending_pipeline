@@ -1,6 +1,6 @@
 import numpy as np
 from pandas import DataFrame
-
+from collections import OrderedDict
 from .table import build_candidate_df
 
 __author__ = "Andrea Tramacere"
@@ -32,7 +32,7 @@ def get_associated_and_contaminant(candidate_df, image_ID, ID_sim_list, verbose=
 
         # get contaminant
         for sim_ID in ID_sim_list:
-            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID'] == ID_sim_list[0], candidate_df['image_ID'] == image_ID))[0][0]
+            sel_row = np.argwhere(np.logical_and(candidate_df['sim_ID'] == sim_ID, candidate_df['image_ID'] == image_ID))[0][0]
             sim_row = candidate_df.loc[sel_row]
             for ID_det in sim_row['ID_det_list']:
                 if ID_det not in assoc_list and ID_det not in contaminant_list:
@@ -121,7 +121,7 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
             print('---->  quality IMAGE',ID_img)
         
         assoc_dict,contaminant_dict,contaminant_list,assoc_list,failed=get_associated_and_contaminant(candidate_df,ID_img,ID_sim_list,verbose=verbose)
-        
+        #print('-> Image ID',ID_img,'assoc',assoc_list,'cont',contaminant_list,contaminant_dict)
 
         if ~failed :
             n_sim = len(ID_sim_list)
@@ -145,11 +145,13 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
 
                 rec_det[ID]=assoc_rec_dict['rec_det_frac']
                 rec_sim[ID]=assoc_rec_dict['rec_sim_frac']
+            for ID_sim in ID_sim_list:
                 if ID_sim in contaminant_dict:
-                    if verbose is True:
-                        print([v['rec_sim_frac'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
-                    contaminant_list.extend([v['rec_sim_frac'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
+                    #if verbose is True:
+                    #print('ID_sim',ID_sim,contaminant_dict[ID_sim])
+                    contaminant_list.extend([v['det_ID'] for v in contaminant_dict[ID_sim] if v['rec_sim_frac']>contam_th])
 
+                contaminant_list=list(OrderedDict.fromkeys(contaminant_list))
             success_n = n_assoc == n_sim and len(contaminant_list) == 0
             success_qual = success_n and np.sum(rec_sim > rec_sim_th) == n_sim
             success_qual = success_qual and np.sum(rec_det > rec_det_th) == n_sim
@@ -161,13 +163,51 @@ def debl_quality_analysis(true_map, candidate_df, rec_det_th=-1, rec_sim_th=-1, 
                         assoc_rec_dict = assoc_dict[ID_sim]
                         print('sim ID', assoc_rec_dict)
                     print('----------')
+            #print('-> Image ID', ID_img, 'overlap',n_overlap,'assoc',n_assoc,'cont',len(contaminant_list),contaminant_list)
+            out.append([ID_img,
+                        failed,
+                        success_n,
+                        success_qual,
+                        n_overlap,
+                        n_assoc,
+                        assoc_list,
+                        len(contaminant_list),
+                        contaminant_list,
+                        rec_det_th,
+                        rec_sim_th,
+                        contam_th,
+                        mag_cut])
 
-            out.append([ID_img, failed,success_n,success_qual,n_overlap,n_assoc,len(contaminant_list),rec_det_th,rec_sim_th,contam_th,mag_cut])
             if verbose is True:
                 print('----> <-----')
         else:
-            out.append([ID_img, failed, -1, -1, -1, -1, 0,rec_det_th,rec_sim_th,contam_th,mag_cut])
-    return DataFrame(out,columns=['image_ID','failed', 'success_n','success_qual', 'overlap','assoc','contaminant','rec_det_th', 'rec_sim_th', 'contam_th','mag_cut'])
+            out.append([ID_img,
+                        failed,
+                        -1,
+                        -1,
+                        -1,
+                        -1,
+                        [],
+                        0,
+                        [],
+                        rec_det_th,
+                        rec_sim_th,
+                        contam_th,
+                        mag_cut])
+
+    return DataFrame(out,columns=['image_ID',
+                                  'failed',
+                                  'success_n',
+                                  'success_qual',
+                                  'overlap',
+                                  'assoc',
+                                  'assoc_list',
+                                  'contaminant',
+                                  'contaminant_list',
+                                  'rec_det_th',
+                                  'rec_sim_th',
+                                  'contam_th',
+                                  'mag_cut'])
 
 def eval_stats(debl_analysis_table,n_sim,debl_filter=None,rec_det_th=-1, rec_sim_th=-1, contam_th=-1,mag_cut=-1):
 

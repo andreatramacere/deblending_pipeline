@@ -526,7 +526,7 @@ def main(argv=None):
     parser.add_argument('-denclue_segm_method', type=str, default='denclue', help='denclue,watershed')
     parser.add_argument('-rec_sim_th', type=float, default=-1.0, help='')
     parser.add_argument('-rec_det_th', type=float, default=-1.0, help='')
-    parser.add_argument('-contam_th', type=float, default=-1.0, help='')
+    parser.add_argument('-contam_th', type=float, default=0.0, help='')
     parser.add_argument('-mag_cut', type=float, default=None, help='mag cut')
     parser.add_argument('-sex_flag', type=str, default=None)
 
