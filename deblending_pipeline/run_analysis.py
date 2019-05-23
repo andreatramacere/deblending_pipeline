@@ -103,7 +103,16 @@ class DataSetAnalysis(object):
             self.debl_map_sex = pf.getdata(segmap_debl_file)
             self.seg_map_sex = pf.getdata(seg_map_file)
     @classmethod
-    def from_name_factory(cls,name,root_rel_path,ast_root_path, debl_method, debl_segmethod, ast_flag, sex_flag,ast_name,mag_cut=None):
+    def from_name_factory(cls,name,
+                          root_rel_path,
+                          ast_root_path,
+                          debl_method,
+                          debl_segmethod,
+                          ast_flag,
+                          sex_flag,
+                          ast_name,
+                          mag_cut=None,
+                          sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         _dict={}
         _dict['couple_skymaker_r1'] = cls.build_couple_skymaker_r1
         _dict['couple_skymaker_r5'] = cls.build_couple_skymaker_r5
@@ -114,12 +123,29 @@ class DataSetAnalysis(object):
         _dict['couple_big_skymaker_r10'] = cls.build_couple_big_skymaker_r10
         _dict['couple_big_CANDELS_r10'] = cls.build_couple_big_CANDELS_r10
 
-        return _dict[name](root_rel_path, ast_root_path,debl_method, debl_segmethod, ast_flag,ast_name, sex_flag,mag_cut=mag_cut)
+        return _dict[name](root_rel_path,
+                           ast_root_path,
+                           debl_method,
+                           debl_segmethod,
+                           ast_flag,
+                           ast_name,
+                           sex_flag,
+                           mag_cut=mag_cut,
+                           sex_path_debl=sex_path_debl)
 
 
 
     @classmethod
-    def build_couple_skymaker_r1(cls, root_rel_path, ast_root_path,debl_method, debl_segmethod, ast_flag,ast_name, sex_flag,mag_cut=None):
+    def build_couple_skymaker_r1(cls,
+                                 root_rel_path,
+                                 ast_root_path,
+                                 debl_method,
+                                 debl_segmethod,
+                                 ast_flag,
+                                 ast_name,
+                                 sex_flag,
+                                 mag_cut=None,
+                                 sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r1',
@@ -130,7 +156,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='r1_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -139,7 +165,16 @@ class DataSetAnalysis(object):
         return d
 
     @classmethod
-    def build_couple_skymaker_r5(cls, root_rel_path,ast_root_path, debl_method, debl_segmethod, ast_flag, ast_name,sex_flag, mag_cut=None):
+    def build_couple_skymaker_r5(cls,
+                                 root_rel_path,
+                                 ast_root_path,
+                                 debl_method,
+                                 debl_segmethod,
+                                 ast_flag,
+                                 ast_name,
+                                 sex_flag,
+                                 mag_cut=None,
+                                 sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r5',
@@ -150,7 +185,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='r5_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -159,7 +194,16 @@ class DataSetAnalysis(object):
         return d
 
     @classmethod
-    def build_couple_CANDELS_r1(cls, root_rel_path,ast_root_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
+    def build_couple_CANDELS_r1(cls,
+                                root_rel_path,
+                                ast_root_path,
+                                debl_method,
+                                debl_segmethod,
+                                ast_flag,
+                                ast_name,
+                                sex_flag,
+                                mag_cut=None,
+                                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r1',
@@ -170,7 +214,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='r1_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -179,7 +223,16 @@ class DataSetAnalysis(object):
         return d
 
     @classmethod
-    def build_couple_CANDELS_r5(cls, root_rel_path,ast_root_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
+    def build_couple_CANDELS_r5(cls,
+                                root_rel_path,
+                                ast_root_path,
+                                debl_method,
+                                debl_segmethod,
+                                ast_flag,
+                                ast_name,
+                                sex_flag,
+                                mag_cut=None,
+                                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='couples_19_26_24.5_d10_r5',
@@ -190,7 +243,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='r5_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -199,7 +252,16 @@ class DataSetAnalysis(object):
         return d
 
     @classmethod
-    def build_single_skymaker_r1(cls, root_rel_path,ast_root_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
+    def build_single_skymaker_r1(cls,
+                                 root_rel_path,
+                                 ast_root_path,
+                                 debl_method,
+                                 debl_segmethod,
+                                 ast_flag,
+                                 ast_name,
+                                 sex_flag,
+                                 mag_cut=None,
+                                 sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='single_19_26_24.5_d10_r1',
@@ -210,7 +272,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='r1_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -219,7 +281,16 @@ class DataSetAnalysis(object):
         return d
 
     @classmethod
-    def build_single_CANDELS_r1(cls, root_rel_path, ast_root_path,debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
+    def build_single_CANDELS_r1(cls,
+                                root_rel_path,
+                                ast_root_path,
+                                debl_method,
+                                debl_segmethod,
+                                ast_flag,
+                                ast_name,
+                                sex_flag,
+                                mag_cut=None,
+                                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='single_19_26_24.5_d10_r1',
@@ -230,7 +301,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='r1_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -241,7 +312,16 @@ class DataSetAnalysis(object):
 
 
     @classmethod
-    def build_couple_big_skymaker_r10(cls, root_rel_path, ast_root_path, debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
+    def build_couple_big_skymaker_r10(cls,
+                                      root_rel_path,
+                                      ast_root_path,
+                                      debl_method,
+                                      debl_segmethod,
+                                      ast_flag,
+                                      ast_name,
+                                      sex_flag,
+                                      mag_cut=None,
+                                      sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='big_19_23_24.5_d50_r10',
@@ -252,7 +332,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='big_r10_skymaker',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
@@ -261,7 +341,16 @@ class DataSetAnalysis(object):
         return d
 
     @classmethod
-    def build_couple_big_CANDELS_r10(cls, root_rel_path, ast_root_path,debl_method, debl_segmethod, ast_flag,  ast_name,sex_flag, mag_cut=None):
+    def build_couple_big_CANDELS_r10(cls,
+                                     root_rel_path,
+                                     ast_root_path,
+                                     debl_method,
+                                     debl_segmethod,
+                                     ast_flag,
+                                     ast_name,
+                                     sex_flag,
+                                     mag_cut=None,
+                                     sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10'):
         d = cls(root_rel_path,
                 'datasets',
                 data_flag='big_19_23_24.5_d50_r10',
@@ -272,7 +361,7 @@ class DataSetAnalysis(object):
                 debl_method=debl_method,
                 debl_segmethod=debl_segmethod,
                 sex_path_seg='sextractor_detection/segmap_detthr_1.2_minarea_10',
-                sex_path_debl='sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
+                sex_path_debl=sex_path_debl,
                 sex_path_debl_1='big_r10_candels',
                 sex_flag=sex_flag,
                 ast_name=ast_name,
