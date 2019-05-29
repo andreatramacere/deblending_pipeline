@@ -539,7 +539,7 @@ def main(argv=None):
     parser.add_argument('-downsampling', action='store_true')
     parser.add_argument('-valid_abs_size_th', type=int, default=8)
     parser.add_argument('-valid_sig_th', type=float, default=1.5)
-    parser.add_argument('-valid_overlap_max', type=float, default=0.85)
+    parser.add_argument('-valid_overlap_max', type=float, default=1.00)
     parser.add_argument('-valid_denc_pb_ratio_th', type=float, default=-1.0)
     parser.add_argument('-valid_denc_pd_ratio_th', type=float, default=-1.0)
     parser.add_argument('-method', type=str, default='denclue',help='denclue')
