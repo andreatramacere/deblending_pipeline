@@ -55,6 +55,8 @@ def run_deblending_detection(dsd,
                              valid_abs_size_th,
                              valid_sig_th,
                              valid_overlap_max,
+                             denc_pb_ratio=0.0,
+                             denc_pd_ratio=0.0,
                              max_image_id=None,
                              log_file=None):
     
@@ -76,7 +78,9 @@ def run_deblending_detection(dsd,
                   valid_abs_size_th=valid_abs_size_th,
                   valid_sig_th=valid_sig_th,
                   overlap_max=valid_overlap_max,
-                  log_file=log_file)
+                  log_file=log_file,
+                  denc_pb_ratio=denc_pb_ratio,
+                  denc_pd_ratio=denc_pd_ratio)
 
 
 
@@ -130,59 +134,66 @@ def run_dblending_analysis(dsa,debl_flag,debl_candidate_df,rec_sim_th,rec_det_th
     return debl_analysis_table,flag,debl_stats
 
 
-
-
-
 def run_asterism(set_name,
-        dsd,
-        run_detection=True,
-        run_candidate=True,
-        run_analysis=True,
-        max_image_id=1,
-        root_data_path='./',
-        root_wd='./',
-        conf_file='conf/detection.conf',
-        root_ast_detection='deblending_detection/asterism',
-        root_ast_analysis='deblending_analysis/asterism',
-        h_min=0.05,
-        h_max=0.20,
-        K_denclue=8,
-        watershed_compactness=0.,
-        validation=True,
-        downsampling=True,
-        valid_abs_size_th=8,
-        valid_sig_th=1.5,
-        valid_overlap_max=0.85,
-        method='denclue',
-        # method='extrema'
-        denclue_segm_method='denclue',
-        # denclue_segm_method='watershed'
-        rec_sim_th=0.1,
-        rec_det_th=-1,
-        contam_th=-1,
-        # overlap_th=-1
-        mag_cut=None):
-
-    sig_pars=locals()
+                 dsd,
+                 run_detection=True,
+                 run_candidate=True,
+                 run_analysis=True,
+                 max_image_id=1,
+                 root_data_path='./',
+                 root_wd='./',
+                 conf_file='conf/detection.conf',
+                 root_ast_detection='deblending_detection/asterism',
+                 root_ast_analysis='deblending_analysis/asterism',
+                 h_min=0.05,
+                 h_max=0.20,
+                 K_denclue=8,
+                 valid_denc_pb_ratio_th=0.0,
+                 valid_denc_pd_ratio_th=0.0,
+                 watershed_compactness=0.,
+                 validation=True,
+                 downsampling=True,
+                 valid_abs_size_th=8,
+                 valid_sig_th=1.5,
+                 valid_overlap_max=0.85,
+                 method='denclue',
+                 # method='extrema'
+                 denclue_segm_method='denclue',
+                 # denclue_segm_method='watershed'
+                 rec_sim_th=0.1,
+                 rec_det_th=-1,
+                 contam_th=-1,
+                 # overlap_th=-1
+                 skip_log_file=False,
+                 mag_cut=None):
+    sig_pars = locals()
     # root_sex_analysis=os.path.join(root_data_path,root_sex_analysis)
-    root_ast_detection=os.path.join(root_wd,root_ast_detection)
-    root_ast_analysis=os.path.join(root_wd,root_ast_analysis)
+    root_ast_detection = os.path.join(root_wd, root_ast_detection)
+    root_ast_analysis = os.path.join(root_wd, root_ast_analysis)
 
     # dsd=DataSetDetection.from_name_factory(set_name,root_data_path)
-    #print('run asterism pipeline',locals())
+    # print('run asterism pipeline',locals())
     # asterism
     # if only_sex is False:
-    ast_flag = dsd.get_run_flag(h_min, h_max, K_denclue,watershed_compactness, validation, valid_abs_size_th, valid_sig_th,
+    ast_flag = dsd.get_run_flag(h_min, h_max,
+                                K_denclue,
+                                watershed_compactness,
+                                validation,
+                                valid_abs_size_th,
+                                valid_sig_th,
                                 valid_overlap_max,
-                                downsampling)
+                                downsampling,
+                                valid_denc_pb_ratio_th,
+                                valid_denc_pd_ratio_th)
+
     if run_detection is True:
+        wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name, method, denclue_segm_method)
+        if skip_log_file is True:
+            log_file = None
+        else:
+            log_file = os.path.join(wd, '%s.log' % ast_flag)
 
-        wd=dsd.get_wd(root_ast_detection,dsd.data_flag,dsd.name,method,denclue_segm_method)
-
-
-
-        log_file=os.path.join(wd,'%s.log'%ast_flag)
-        print('run asterism pipeline wd',wd)
+        print('run asterism pipeline wd', wd)
         run_deblending_detection(dsd,
                                  conf_file,
                                  root_ast_detection,
@@ -197,6 +208,8 @@ def run_asterism(set_name,
                                  valid_abs_size_th,
                                  valid_sig_th,
                                  valid_overlap_max,
+                                 denc_pb_ratio=valid_denc_pb_ratio_th,
+                                 denc_pd_ratio=valid_denc_pd_ratio_th,
                                  max_image_id=max_image_id,
                                  log_file=log_file)
 
@@ -215,8 +228,10 @@ def run_asterism(set_name,
 
     if run_detection is True:
         out_asterims_prods = glob.glob(os.path.join(dsa.ast_path, '%s*.fits' % ast_flag))
-        # print (out_asterims_prods)
-        out_asterims_prods.append(log_file)
+
+        if log_file is not None:
+            out_asterims_prods.append(log_file)
+
         gzip_files(out_asterims_prods)
 
 
@@ -232,7 +247,7 @@ def run_asterism(set_name,
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
 
     keep_list=['conf_file','name','max_image_id', 'method',
-     'denclue_segm_method', 'h_frac_min', 'h_frac_max', 'valid_abs_size_th',
+     'denclue_segm_method', 'h_frac_min', 'h_frac_max', 'valid_abs_size_th','denc_p_ratio_th',
      'valid_sig_th', 'overlap_max', 'K_denclue', 'watershed_compactness','downsampling',
      'validate_children', 'morph_corr', 'log_file']
 
@@ -270,7 +285,7 @@ def run_asterism(set_name,
         df_analysis_table = DataFrame(debl_analysis_table)
         df_analysis_stats = DataFrame(debl_stats)
 
-        #print('detection pars', pars.keys())
+        print('analsys_file_ast_stat', analsys_file_ast_stat)
         #print('signature  pars',  sig_pars.keys())
         # df_pars=pandas.DataFrame(pars)
         # df_analysis_stats=pandas.concat([df_pars,df_stats], axis=1, sort=False)
@@ -431,6 +446,8 @@ def run(set_name,
         downsampling=True,
         valid_abs_size_th=8,
         valid_sig_th=1.5,
+        valid_denc_pb_ratio_th=0.0,
+        valid_denc_pd_ratio_th=0.0,
         valid_overlap_max=0.85,
         method='denclue',
         #method='extrema'
@@ -440,6 +457,7 @@ def run(set_name,
         rec_det_th=-1,
         contam_th=-1,
         #overlap_th=-1
+        skip_log_file=False,
         mag_cut=None,
         sex_flag=None):
 
@@ -522,6 +540,8 @@ def main(argv=None):
     parser.add_argument('-valid_abs_size_th', type=int, default=8)
     parser.add_argument('-valid_sig_th', type=float, default=1.5)
     parser.add_argument('-valid_overlap_max', type=float, default=0.85)
+    parser.add_argument('-valid_denc_pb_ratio_th', type=float, default=-1.0)
+    parser.add_argument('-valid_denc_pd_ratio_th', type=float, default=-1.0)
     parser.add_argument('-method', type=str, default='denclue',help='denclue')
     parser.add_argument('-denclue_segm_method', type=str, default='denclue', help='denclue,watershed')
     parser.add_argument('-rec_sim_th', type=float, default=-1.0, help='')
@@ -529,7 +549,7 @@ def main(argv=None):
     parser.add_argument('-contam_th', type=float, default=0.0, help='')
     parser.add_argument('-mag_cut', type=float, default=None, help='mag cut')
     parser.add_argument('-sex_flag', type=str, default=None)
-
+    parser.add_argument('-skip_log_file', action='store_true')
     args = parser.parse_args()
 
     run(**vars(args))
