@@ -246,19 +246,21 @@ def run_asterism(set_name,
     wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name,method, denclue_segm_method)
     par_file = os.path.join(wd, '%s_par.json' % ast_flag)
 
-    keep_list=['conf_file','name','max_image_id', 'method',
-     'denclue_segm_method', 'h_frac_min', 'h_frac_max', 'valid_abs_size_th','denc_p_ratio_th',
+    keep_list=['conf_file','name','max_image_id', 'method','denclue_segm_method', 'h_frac_min', 'h_frac_max', 'valid_abs_size_th','denc_pd_ratio_th','denc_pb_ratio_th',
      'valid_sig_th', 'overlap_max', 'K_denclue', 'watershed_compactness','downsampling',
      'validate_children', 'morph_corr', 'log_file']
 
     with open(par_file, 'r') as fp:
         pars = json.load(fp)
+    print('par_file',par_file)
 
     for k in list(pars.keys()):
-        #print ('->',k)
+
         if k not in keep_list:
+            print('->', k)
             pars.pop(k)
 
+    print(pars)
 
 
     if run_candidate is True:
@@ -537,7 +539,7 @@ def main(argv=None):
     parser.add_argument('-watershed_compactness', type=float, default=0.0)
     parser.add_argument('-validation', action='store_true')
     parser.add_argument('-downsampling', action='store_true')
-    parser.add_argument('-valid_abs_size_th', type=int, default=8)
+    parser.add_argument('-valid_abs_size_th', type=int, default=1)
     parser.add_argument('-valid_sig_th', type=float, default=1.5)
     parser.add_argument('-valid_overlap_max', type=float, default=1.00)
     parser.add_argument('-valid_denc_pb_ratio_th', type=float, default=-1.0)
