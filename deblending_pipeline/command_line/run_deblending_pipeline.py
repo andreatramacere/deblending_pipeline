@@ -321,7 +321,7 @@ def run_sextractor(set_name,
         rec_sim_th=0.1,
         rec_det_th=-1,
         contam_th=-1,
-        #overlap_th=-1
+        sex_path_debl='./sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
         mag_cut=None,
         sex_flag='DebNthr_64_DebMin_0.0001'):
 
@@ -342,6 +342,7 @@ def run_sextractor(set_name,
                                             None,
                                             debl_method=None,
                                             debl_segmethod=None,
+                                            sex_path_debl=sex_path_debl,
                                             ast_flag=None,
                                             ast_name=dsd.name,
                                             sex_flag=sex_flag,
@@ -458,7 +459,7 @@ def run(set_name,
         rec_sim_th=0.1,
         rec_det_th=-1,
         contam_th=-1,
-        #overlap_th=-1
+        sex_path_debl='./sextractor_detection/segmap_debl_detthr_1.2_minarea_10',
         skip_log_file=False,
         mag_cut=None,
         sex_flag=None):
@@ -488,16 +489,19 @@ def run(set_name,
             if param.name in pars_dict.keys():
                 sex_parm_dict[param.name]=pars_dict[param.name]
 
+        dsa = DataSetAnalysis.from_name_factory(set_name,
+                                                root_data_path,
+                                                None,
+                                                debl_method=None,
+                                                debl_segmethod=None,
+                                                ast_flag=None,
+                                                sex_path_debl=sex_path_debl,
+                                                sex_flag=sex_flag,
+                                                ast_name=dsd.name,
+                                                mag_cut=mag_cut)
+
         if sex_flag is None:
-            dsa = DataSetAnalysis.from_name_factory(set_name,
-                                                    root_data_path,
-                                                    None,
-                                                    debl_method=None,
-                                                    debl_segmethod=None,
-                                                    ast_flag=None,
-                                                    sex_flag=sex_flag,
-                                                    ast_name=dsd.name,
-                                                    mag_cut=mag_cut)
+
             _p = os.path.join(dsa.sex_deblm_map_path,'*segmentation_map_debl*')
             print('_p',_p)
             _fl = glob.glob(_p)
@@ -532,6 +536,7 @@ def main(argv=None):
     parser.add_argument('-max_image_id', type=int, default=None)
     parser.add_argument('-root_wd', type=str, default='./')
     parser.add_argument('-root_data_path', type=str, default='./')
+    parser.add_argument('-sex_path_debl', type=str, default='./sextractor_detection/segmap_debl_detthr_1.2_minarea_10')
     parser.add_argument('-conf_file', type=str, default='conf/detection.conf')
     parser.add_argument('-h_min', type=float, default=0.05)
     parser.add_argument('-h_max', type=float, default=0.20)
