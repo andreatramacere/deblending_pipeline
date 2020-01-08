@@ -369,69 +369,6 @@ class DataSetAnalysis(object):
 
         return d
 
-def select_catalog_par(debl_rep,catalog,p,msk_sel,true_map,seg_map):
-    x=[]
-    p_sel=[]
-    
-    for ID,img_ID in enumerate(debl_rep['image_ID'][msk_sel]):
-        id_parent=np.unique(seg_map[img_ID][np.logical_and(true_map[img_ID],seg_map[img_ID])])
-        id_parent=id_parent[id_parent>0]
-        msk=np.logical_and(np.isin(catalog['src_ID'],id_parent),catalog['image_ID']==img_ID)
-        #print(id_parent)
-        if msk.sum()<1:
-            pass
-        else:
-            #print (catalog['image_ID'][msk])
-            x.extend(p[msk])
-           
-            
-    for ID,img_ID in enumerate(debl_rep['image_ID']):
-        id_parent=np.unique(seg_map[img_ID][np.logical_and(true_map[img_ID],seg_map[img_ID])])
-        id_parent=id_parent[id_parent>0]
-        msk=np.logical_and(np.isin(catalog['src_ID'],id_parent),catalog['image_ID']==img_ID)
-        #print(id_parent)
-       
-       
-        if msk.sum()<1:
-            pass
-        else:
-            #print (catalog['image_ID'][msk])
-            
-            p_sel.extend(p[msk])
-     
-    return np.array(x),np.array(p_sel)
-
-
-def anlysis(debl_rep,segment_catalog,deblended_catalog,n_sim,true_map,seg_map):
-    
-    fig,(ax1,ax2,ax3)=plt.subplots(1,3,figsize=(12,4))
-    p=segment_catalog['r_max']/segment_catalog['r_cluster']
-    
-    h=np.zeros(p.size)
-    for ID,im_id in enumerate(segment_catalog['image_ID']):
-        _h=deblended_catalog['h'][deblended_catalog['image_ID']==im_id]
-        if len(_h)==0:
-            h[ID]=None
-        else:
-            h[ID]=_h[0]
-
-    print(h[~np.isnan(h)].min(),h[~np.isnan(h)].max())
-    p=h/segment_catalog['r_max']
-
-    msk_sel=debl_rep['overlap']>n_sim
-    x,p_sel=select_catalog_par(debl_rep,segment_catalog,p,msk_sel,true_map,seg_map)
-    ax1.hist(p_sel,density=True)
-    ax1.hist(x,fill=False,density=True,edgecolor='red',alpha=0.5)
-
-    msk_sel=debl_rep['overlap']<n_sim
-    x,p_sel=select_catalog_par(debl_rep,segment_catalog,p,msk_sel,true_map,seg_map)
-    ax2.hist(p_sel,density=True)
-    ax2.hist(x,fill=False,density=True,edgecolor='blue',alpha=0.5)
-
-    msk_sel=debl_rep['overlap']==n_sim
-    x,p_sel=select_catalog_par(debl_rep,segment_catalog,p,msk_sel,true_map,seg_map)
-    ax3.hist(p_sel,density=True)
-    ax3.hist(x,fill=False,density=True,edgecolor='black',alpha=0.5)
 
 
 

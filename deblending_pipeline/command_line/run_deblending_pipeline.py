@@ -7,9 +7,9 @@ import sys
 import warnings
 from deblending_pipeline.run_asterism import DataSetDetection
 from deblending_pipeline.run_asterism import from_cl
-from deblending_pipeline.table import build_candidate_df
-from deblending_pipeline.run_analysis import DataSetAnalysis
-from deblending_pipeline.analysis import deblending_analysis
+from deblending_pipeline.candidate_table import build_candidate_df
+from deblending_pipeline.run_candidate_analysis import DataSetAnalysis
+from deblending_pipeline.candiate_analysis import deblending_analysis
 import pandas as pd
 import gzip
 import shutil
@@ -57,6 +57,7 @@ def run_deblending_detection(dsd,
                              valid_overlap_max,
                              denc_pb_ratio=0.0,
                              denc_pd_ratio=0.0,
+                             denc_prandom_ratio=None,
                              max_image_id=None,
                              log_file=None):
     
@@ -80,7 +81,8 @@ def run_deblending_detection(dsd,
                   overlap_max=valid_overlap_max,
                   log_file=log_file,
                   denc_pb_ratio=denc_pb_ratio,
-                  denc_pd_ratio=denc_pd_ratio)
+                  denc_pd_ratio=denc_pd_ratio,
+                  denc_prandom_ratio=denc_prandom_ratio)
 
 
 
@@ -150,6 +152,7 @@ def run_asterism(set_name,
                  K_denclue=8,
                  valid_denc_pb_ratio_th=0.0,
                  valid_denc_pd_ratio_th=0.0,
+                 valid_denc_prandom_ratio_th=0.0,
                  watershed_compactness=0.,
                  validation=True,
                  downsampling=True,
@@ -184,7 +187,8 @@ def run_asterism(set_name,
                                 valid_overlap_max,
                                 downsampling,
                                 valid_denc_pb_ratio_th,
-                                valid_denc_pd_ratio_th)
+                                valid_denc_pd_ratio_th,
+                                valid_denc_prandom_ratio_th)
 
     if run_detection is True:
         wd = dsd.get_wd(root_ast_detection, dsd.data_flag, dsd.name, method, denclue_segm_method)
@@ -210,6 +214,7 @@ def run_asterism(set_name,
                                  valid_overlap_max,
                                  denc_pb_ratio=valid_denc_pb_ratio_th,
                                  denc_pd_ratio=valid_denc_pd_ratio_th,
+                                 denc_prandom_ratio=valid_denc_prandom_ratio_th,
                                  max_image_id=max_image_id,
                                  log_file=log_file)
 
@@ -317,7 +322,7 @@ def run_sextractor(set_name,
         max_image_id=1,
         root_data_path='./',
         root_wd='./',
-        root_sex_analysis='deblending_analysis/sextractor',
+        root_sex_analysis='sextractor_detection/sextractor',
         rec_sim_th=0.1,
         rec_det_th=-1,
         contam_th=-1,
@@ -451,6 +456,7 @@ def run(set_name,
         valid_sig_th=1.5,
         valid_denc_pb_ratio_th=0.0,
         valid_denc_pd_ratio_th=0.0,
+        valid_denc_prandom_ratio_th=0.0,
         valid_overlap_max=0.85,
         method='denclue',
         #method='extrema'
@@ -549,6 +555,7 @@ def main(argv=None):
     parser.add_argument('-valid_overlap_max', type=float, default=1.00)
     parser.add_argument('-valid_denc_pb_ratio_th', type=float, default=-1.0)
     parser.add_argument('-valid_denc_pd_ratio_th', type=float, default=-1.0)
+    parser.add_argument('-valid_denc_prandom_ratio_th', type=float, default=-1.0)
     parser.add_argument('-method', type=str, default='denclue',help='denclue')
     parser.add_argument('-denclue_segm_method', type=str, default='denclue', help='denclue,watershed')
     parser.add_argument('-rec_sim_th', type=float, default=-1.0, help='')

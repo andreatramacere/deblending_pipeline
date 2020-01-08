@@ -1,7 +1,7 @@
 import numpy as np
 from pandas import DataFrame
 from collections import OrderedDict
-from .table import build_candidate_df
+from .candidate_table import build_candidate_df
 
 __author__ = "Andrea Tramacere"
 

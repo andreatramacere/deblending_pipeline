@@ -118,12 +118,15 @@ class DataSetDetection(object):
                      valid_overlap_max,
                      downsampling,
                      denc_pb_ratio,
-                     denc_pd_ratio):
+                     denc_pd_ratio,
+                     denc_prand_ratio=None):
 
         flag = 'h_min_%2.2f_h_max_%2.2f_K_denc_%2.2d_comp_%2.2f_donws_%d_valid_%d' % (h_frac_min, h_frac_max,K_denclue,watershed_compactness,downsampling,validate_children)
         if validate_children is True:
             flag = flag+'_size_th_%3.3d_sig_th_%2.2f_overlap_th_%2.2f_pb_th_%2.2f_pd_th_%2.2f'%(valid_abs_size_th, valid_sig_th,
                                                                         valid_overlap_max,denc_pb_ratio,denc_pd_ratio)
+            if denc_prand_ratio is not None:
+                flag = flag+'_prand_th_%2.2f'%denc_prand_ratio
         return flag
 
     @staticmethod
@@ -154,7 +157,8 @@ class DataSetDetection(object):
                       overlap_max=0.85,
                       log_file=None,
                       denc_pb_ratio=0.0,
-                      denc_pd_ratio=0.0):
+                      denc_pd_ratio=0.0,
+                      denc_prandom_ratio=None):
 
         _run_detection(cube=self.cube_file,
                        name=name,
@@ -179,7 +183,8 @@ class DataSetDetection(object):
                        overlap_max=overlap_max,
                        log_file=log_file,
                        denc_pb_ratio_th=denc_pb_ratio,
-                       denc_pd_ratio_th=denc_pd_ratio)
+                       denc_pd_ratio_th=denc_pd_ratio,
+                       denc_prandom_ratio_th=denc_prandom_ratio)
 
 
 
@@ -203,6 +208,7 @@ def _run_detection(cube,
                    denclue_segm_method='',
                    denc_pb_ratio_th=0.0,
                    denc_pd_ratio_th=0.0,
+                   denc_prandom_ratio_th=None,
                    h_frac_min=0.05,
                    h_frac_max=0.20,
                    valid_abs_size_th=8,
@@ -272,6 +278,7 @@ def _run_detection(cube,
     pipeline.do_src_detection.deblending_validation.set_par('overlap_max', value=overlap_max)
     pipeline.do_src_detection.deblending_validation.set_par('denc_pb_ratio_th', value=denc_pb_ratio_th)
     pipeline.do_src_detection.deblending_validation.set_par('denc_pd_ratio_th', value=denc_pd_ratio_th)
+    pipeline.do_src_detection.deblending_validation.set_par('denc_prandom_ratio_th', value=denc_prandom_ratio_th)
 
     pipeline.do_src_detection.set_deblending_method.set_par('method', value=method)
 
@@ -299,7 +306,8 @@ def _run_detection(cube,
                                          overlap_max,
                                          downsampling,
                                          denc_pb_ratio_th,
-                                         denc_pd_ratio_th)
+                                         denc_pd_ratio_th,
+                                         denc_prand_ratio=denc_prandom_ratio_th)
     #print("flag", flag)
     pipeline.IO_conf_task.set_par('flag', value=flag)
 
